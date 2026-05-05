@@ -1,0 +1,178 @@
+.transactions-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+.page-header p { color: var(--text-secondary); }
+
+.header-actions { display: flex; gap: 12px; }
+
+.secondary-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-radius: 12px;
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.secondary-btn:hover { background: var(--bg-tertiary); }
+
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  position: relative;
+  width: 400px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.search-bar input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  padding: 10px 10px 10px 40px;
+  border-radius: 10px;
+  color: white;
+  outline: none;
+}
+
+.filter-actions { display: flex; gap: 12px; }
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  border-radius: 10px;
+}
+
+.sort-select {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 10px;
+  outline: none;
+}
+
+.table-container { padding: 0.5rem; }
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.transactions-table th {
+  padding: 1.25rem 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transactions-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.transaction-info { display: flex; align-items: center; gap: 12px; }
+
+.type-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.type-icon.income { background: rgba(16, 185, 129, 0.1); color: var(--accent-secondary); }
+.type-icon.expense { background: rgba(244, 63, 94, 0.1); color: var(--accent-danger); }
+
+.transaction-name { font-weight: 600; }
+
+.category-tag {
+  padding: 4px 10px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.date-text { color: var(--text-secondary); font-size: 0.9rem; }
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-pill.completed { background: rgba(16, 185, 129, 0.1); color: var(--accent-secondary); }
+.status-pill.pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+.amount-text { font-weight: 700; font-size: 1rem; }
+.amount-text.income { color: var(--accent-secondary); }
+.amount-text.expense { color: var(--text-primary); }
+
+.more-btn { color: var(--text-muted); transition: var(--transition-smooth); }
+.more-btn:hover { color: var(--text-primary); }
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.pagination-info { color: var(--text-muted); font-size: 0.9rem; }
+
+.pagination-btns { display: flex; gap: 8px; }
+
+.page-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.page-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+.page-btn:hover:not(.disabled):not(.active) { background: var(--bg-tertiary); color: white; }
+.page-btn.disabled { opacity: 0.3; cursor: not-allowed; }
