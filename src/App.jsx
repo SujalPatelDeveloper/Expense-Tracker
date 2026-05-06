@@ -9,7 +9,10 @@ import Transactions from './pages/Transactions';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
 import Savings from './pages/Savings';
+import Investments from './pages/Investments';
+import Subscriptions from './pages/Subscriptions';
 import { TransactionProvider } from './context/TransactionContext';
+import { ToastProvider } from './context/ToastContext';
 import './index.css';
 import './App.css';
 
@@ -45,21 +48,25 @@ const Layout = ({ children }) => {
 
 function App() {
   return (
-    <TransactionProvider>
-      <Router>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/savings" element={<Savings />} />
-          </Routes>
-        </Layout>
-      </Router>
-    </TransactionProvider>
+    <ToastProvider>
+      <TransactionProvider>
+        <Router>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/savings" element={<Savings />} />
+              <Route path="/investments" element={<Investments />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+            </Routes>
+          </Layout>
+        </Router>
+      </TransactionProvider>
+    </ToastProvider>
   );
 }
 

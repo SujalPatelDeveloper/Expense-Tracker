@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   AreaChart, 
   Area, 
@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import AddTransactionModal from '../components/AddTransactionModal';
+import CountUp from '../components/CountUp';
 import './Dashboard.css';
 
 const currencies = [
@@ -40,11 +41,11 @@ const currencies = [
 ];
 
 const Dashboard = () => {
-  const { transactions, totals, goals } = useTransactions();
+  const { transactions, totals, goals, user, searchQuery, setSearchQuery } = useTransactions();
   const [isDark, setIsDark] = useState(true);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const categoryData = React.useMemo(() => {
+  const categoryData = useMemo(() => {
     const categories = {};
     transactions.filter(t => t.type === 'expense').forEach(t => {
       categories[t.category] = (categories[t.category] || 0) + Math.abs(t.amount);
@@ -66,7 +67,7 @@ const Dashboard = () => {
     }));
   }, [transactions]);
 
-  const cashFlowData = React.useMemo(() => {
+  const cashFlowData = useMemo(() => {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const data = days.map(name => ({ name, income: 0, expense: 0 }));
     
@@ -92,7 +93,12 @@ const Dashboard = () => {
         <header className="top-header">
           <div className="header-search">
             <Search size={18} />
-            <input type="text" placeholder="Search analytics, transactions..." />
+            <input 
+              type="text" 
+              placeholder="Search analytics, transactions..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           
           <div className="header-right">
@@ -117,18 +123,24 @@ const Dashboard = () => {
             </div>
             
             <div className="user-profile-header">
-              <div className="header-avatar">U</div>
+              <div className="header-avatar">
+                {user.avatar ? (
+                  <img src={user.avatar} alt="Avatar" className="header-avatar-img" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
+              </div>
               <div className="header-user-info">
-                <span className="name">User</span>
-                <span className="role">Wealth Master</span>
+                <span className="name">{user.name}</span>
+                <span className="role">{user.plan}</span>
               </div>
             </div>
           </div>
         </header>
 
         {/* Hero Section */}
-        <section className="dashboard-hero">
-          <div className="greeting-box">
+        <section className="dashboard-hero-split">
+          <div className="greeting-box fade-in">
             <h1>Welcome back! 👋</h1>
             <p>
               {transactions.length > 0 
@@ -136,8 +148,24 @@ const Dashboard = () => {
                 : "Add your first transaction to start tracking your wealth."}
             </p>
           </div>
-          
-          <div className="ai-insight-card glass-panel">
+
+          <div className="net-worth-card glass-panel fade-in">
+            <div className="net-worth-info">
+              <span className="label">Total Net Worth</span>
+              <div className="value-group">
+                <span className="currency">$</span>
+                <span className="value">
+                  <CountUp end={totals.netWorth} decimals={2} />
+                </span>
+              </div>
+            </div>
+            <div className="net-worth-visual">
+              <TrendingUp size={32} />
+            </div>
+          </div>
+        </section>
+
+        <div className="ai-insight-card glass-panel">
             <div className="insight-icon">
               <Sparkles size={20} />
             </div>
@@ -153,7 +181,6 @@ const Dashboard = () => {
               {transactions.length > 0 ? "View Details" : "Learn More"}
             </button>
           </div>
-        </section>
 
         {/* Metrics Row */}
         <section className="metrics-grid">
@@ -165,7 +192,9 @@ const Dashboard = () => {
                 <span>+2.4%</span>
               </div>
             </div>
-            <div className="metric-value">${totals.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="metric-value">
+              <CountUp end={totals.balance} prefix="$" decimals={2} />
+            </div>
             <div className="sparkline-placeholder"></div>
             <p className="metric-subtext">Current Wallet Balance</p>
           </div>
@@ -178,7 +207,9 @@ const Dashboard = () => {
                 <span>+8.1%</span>
               </div>
             </div>
-            <div className="metric-value">${totals.income.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="metric-value">
+              <CountUp end={totals.income} prefix="$" decimals={2} />
+            </div>
             <div className="sparkline-placeholder"></div>
             <p className="metric-subtext">Total deposits this month</p>
           </div>
@@ -191,7 +222,9 @@ const Dashboard = () => {
                 <span>-0.5%</span>
               </div>
             </div>
-            <div className="metric-value">${totals.expense.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="metric-value">
+              <CountUp end={totals.expense} prefix="$" decimals={2} />
+            </div>
             <div className="sparkline-placeholder"></div>
             <p className="metric-subtext">Total spending this month</p>
           </div>
@@ -289,13 +322,18 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="category-legend">
-                {categoryData.map((item) => (
-                  <div key={item.name} className="legend-item">
-                    <div className="dot" style={{ backgroundColor: item.color }}></div>
-                    <span className="cat-name">{item.name}</span>
-                    <span className="cat-percent">{item.value}%</span>
-                  </div>
-                ))}
+                {categoryData.map((item) => {
+                  const percentage = totals.expense > 0 
+                    ? Math.round((item.value / totals.expense) * 100) 
+                    : 0;
+                  return (
+                    <div key={item.name} className="legend-item">
+                      <div className="dot" style={{ backgroundColor: item.color }}></div>
+                      <span className="cat-name">{item.name}</span>
+                      <span className="cat-percent">{percentage}%</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

@@ -106,8 +106,107 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.cat-stat-item:hover, .cat-stat-item.active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cat-stat-item.active {
+  border: 1px solid var(--glass-border);
+}
+
+.drill-down-section {
+  margin-top: 2rem;
+  padding: 2rem;
+}
+
+.drill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.drill-header h3 span {
+  color: var(--accent-primary);
+}
+
+.close-drill {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+}
+
+.close-drill:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
+.drill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.drill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  transition: var(--transition-smooth);
+}
+
+.drill-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.drill-item-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.drill-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-tertiary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+
+.drill-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.drill-info .merchant {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.drill-info .date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.drill-amount {
+  font-weight: 700;
+  color: var(--accent-danger);
 }
 
 .cat-name-box {

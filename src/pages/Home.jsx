@@ -8,140 +8,195 @@ import {
   Smartphone,
   CheckCircle2,
   ChevronRight,
-  Globe,
-  Mail,
-  Link as LinkIcon,
-  TrendingUp
+  TrendingUp,
+  Sparkles,
+  PieChart,
+  Layers,
+  ArrowUpRight,
+  Sun,
+  Moon
 } from 'lucide-react';
+import CountUp from '../components/CountUp';
 import './Home.css';
 
 const Landing = () => {
+  const [isDark, setIsDark] = React.useState(true);
+
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme ? 'dark' : 'light');
+  };
+
   return (
     <div className="landing-wrapper">
+      {/* Decorative Background Elements */}
+      <div className="bg-glow top-right"></div>
+      <div className="bg-glow bottom-left"></div>
+
+      {/* Navigation */}
+      <nav className="landing-nav glass-panel fade-in">
+        <div className="nav-logo">
+          <TrendingUp color="var(--accent-primary)" size={28} />
+          <span>FinVista</span>
+        </div>
+        <div className="nav-links">
+          <Link to="/about">Features</Link>
+          <Link to="/dashboard">Dashboard</Link>
+          <button className="theme-toggle-landing" onClick={toggleTheme}>
+            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <Link to="/dashboard" className="nav-cta">Launch App</Link>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="hero-landing fade-in">
         <div className="hero-content">
-          <div className="hero-announcement">
-            <span className="badge">New</span>
-            <span>AI Wealth Intelligence is here</span>
+          <div className="hero-announcement glass-panel">
+            <span className="badge">Pro</span>
+            <span>New: Advanced Portfolio Analytics is Live</span>
             <ChevronRight size={16} />
           </div>
-          <h1>Take Control of Your <br /><span className="gradient-text">Financial Future</span></h1>
+          <h1>Master Your Wealth with <br /><span className="gradient-text">Precision Intelligence</span></h1>
           <p className="hero-subtitle">
-            FinVista combines advanced analytics with intuitive design to help you track, 
-            save, and grow your wealth effortlessly.
+            Experience the next generation of financial management. FinVista combines 
+            glassmorphic design with AI-driven insights to transform your data into growth.
           </p>
           <div className="hero-cta">
             <Link to="/dashboard" className="primary-btn">
-              Get Started Free <ArrowRight size={20} />
+              Get Started for Free <ArrowRight size={20} />
             </Link>
-            <Link to="/about" className="secondary-btn">How it Works</Link>
+            <div className="user-stats">
+              <div className="stat-avatars">
+                <div className="avatar v1">JD</div>
+                <div className="avatar v2">AK</div>
+                <div className="avatar v3">SP</div>
+                <div className="avatar plus-avatar">+5k</div>
+              </div>
+              <span>Joined by 50,000+ smart investors</span>
+            </div>
           </div>
         </div>
         
         <div className="hero-visual">
-          <div className="visual-mockup">
-            <div className="mockup-chart">
-              {/* Simple mock bars for visual effect */}
-              <div className="mockup-bar" style={{ height: '60%', left: '10%' }}></div>
-              <div className="mockup-bar" style={{ height: '80%', left: '30%', backgroundColor: '#10b981' }}></div>
-              <div className="mockup-bar" style={{ height: '40%', left: '50%' }}></div>
-              <div className="mockup-bar" style={{ height: '90%', left: '70%', backgroundColor: '#f59e0b' }}></div>
+          <div className="hero-dashboard-preview-new glass-panel fade-in-up">
+            <img src="/src/assets/FinVista_Dashboard_Dark.png" alt="FinVista Dashboard Dark" className="mockup-img dark-preview" />
+            <img src="/src/assets/FinVista_Dashboard_Light.png" alt="FinVista Dashboard Light" className="mockup-img light-preview" />
+            
+            {/* Floating Elements */}
+            <div className="floating-card c1 glass-panel">
+              <div className="f-icon"><TrendingUp size={20} /></div>
+              <div className="f-info">
+                <span>Net Worth</span>
+                <strong>$124,500.00</strong>
+              </div>
+            </div>
+            <div className="floating-card c2 glass-panel">
+              <div className="f-icon"><PieChart size={20} /></div>
+              <div className="f-info">
+                <span>Investments</span>
+                <strong>+12.4%</strong>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Preview */}
+      {/* Stats Section */}
+      <section className="landing-stats glass-panel">
+        <div className="stat-item">
+          <h3><CountUp end={98} suffix="%" /></h3>
+          <p>Customer Satisfaction</p>
+        </div>
+        <div className="stat-item">
+          <h3><CountUp end={2.4} suffix="M" decimals={1} /></h3>
+          <p>Transactions Tracked</p>
+        </div>
+        <div className="stat-item">
+          <h3><CountUp end={150} suffix="K+" /></h3>
+          <p>Active Portfolios</p>
+        </div>
+        <div className="stat-item">
+          <h3><CountUp end={0} suffix="$" /></h3>
+          <p>Hidden Fees</p>
+        </div>
+      </section>
+
+      {/* Features Section */}
       <section className="features-landing">
         <div className="section-header">
-          <h2>Everything you need to <br />master your money</h2>
-          <p>Ditch the spreadsheets. FinVista automates your financial tracking so you can focus on what matters.</p>
+          <span className="section-badge">Core Capabilities</span>
+          <h2>Intelligent tools for <br />the modern investor</h2>
         </div>
         
         <div className="features-grid-landing">
-          <div className="landing-feature-card glass-panel">
-            <div className="icon-box"><BarChart3 size={28} /></div>
-            <h3>Smart Analytics</h3>
-            <p>Visualise your cash flow, expenses, and net worth trends with beautiful, interactive charts.</p>
+          <div className="landing-feature-card glass-panel hover-lift">
+            <div className="icon-box-premium"><BarChart3 size={32} /></div>
+            <h3>Deep Analytics</h3>
+            <p>Go beyond simple tracking with predictive modeling and trend analysis.</p>
+            <div className="card-link">Explore Analytics <ArrowUpRight size={16} /></div>
           </div>
-          <div className="landing-feature-card glass-panel">
-            <div className="icon-box"><ShieldCheck size={28} /></div>
-            <h3>Secure by Design</h3>
-            <p>Your data is encrypted and protected with bank-grade security protocols at every step.</p>
+          <div className="landing-feature-card glass-panel hover-lift">
+            <div className="icon-box-premium"><Sparkles size={32} /></div>
+            <h3>AI Insights</h3>
+            <p>Personalized wealth recommendations powered by our proprietary algorithms.</p>
+            <div className="card-link">See AI in Action <ArrowUpRight size={16} /></div>
           </div>
-          <div className="landing-feature-card glass-panel">
-            <div className="icon-box"><Zap size={28} /></div>
-            <h3>AI Wealth Insights</h3>
-            <p>Get personalized recommendations to optimize your spending and reach your goals faster.</p>
-          </div>
-          <div className="landing-feature-card glass-panel">
-            <div className="icon-box"><Smartphone size={28} /></div>
-            <h3>Always with You</h3>
-            <p>Access your dashboard from any device, anywhere. Stay on top of your finances on the go.</p>
+          <div className="landing-feature-card glass-panel hover-lift">
+            <div className="icon-box-premium"><Layers size={32} /></div>
+            <h3>Unified Portfolio</h3>
+            <p>Crypto, Stocks, ETFs, and Cash. Everything managed in one stunning view.</p>
+            <div className="card-link">Manage Assets <ArrowUpRight size={16} /></div>
           </div>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="trust-section glass-panel">
-        <div className="trust-content">
-          <h2>Ready to transform your finances?</h2>
-          <p>Join over 50,000+ users who are already using FinTrace to manage their wealth.</p>
-          <div className="trust-list">
-            <div className="trust-item"><CheckCircle2 size={20} color="var(--accent-secondary)" /> No credit card required</div>
-            <div className="trust-item"><CheckCircle2 size={20} color="var(--accent-secondary)" /> Secure & Private</div>
-            <div className="trust-item"><CheckCircle2 size={20} color="var(--accent-secondary)" /> Free for individuals</div>
+      {/* CTA Section */}
+      <section className="landing-cta-box glass-panel">
+        <div className="cta-content">
+          <h2>Ready to revolutionize your <br />financial life?</h2>
+          <p>Join the future of wealth intelligence today. No credit card required.</p>
+          <div className="cta-btns">
+            <Link to="/dashboard" className="primary-btn large">Start Free Trial</Link>
+            <Link to="/about" className="secondary-btn large">View Pricing</Link>
           </div>
-          <Link to="/dashboard" className="primary-btn large">Start Tracking Now</Link>
         </div>
       </section>
 
-      {/* Footer Section */}
-      <footer className="main-footer glass-panel">
-        <div className="footer-grid">
-          <div className="footer-brand">
-            <div className="logo-container-footer">
-              <TrendingUp color="var(--accent-primary)" size={24} />
-              <span className="logo-text">FinVista</span>
+      {/* Footer */}
+      <footer className="landing-footer">
+        <div className="footer-top">
+          <div className="footer-info">
+            <div className="nav-logo">
+              <TrendingUp color="var(--accent-primary)" size={28} />
+              <span>FinVista</span>
             </div>
-            <p className="footer-tagline">
-              Mastering wealth intelligence through AI and intuitive design.
-            </p>
-            <div className="social-links">
-              <div className="social-icon"><Globe size={18} /></div>
-              <div className="social-icon"><Mail size={18} /></div>
-              <div className="social-icon"><LinkIcon size={18} /></div>
-            </div>
+            <p>The world's most beautiful financial intelligence platform.</p>
           </div>
-          
-          <div className="footer-links">
-            <div className="link-group">
+          <div className="footer-links-grid">
+            <div className="f-col">
               <h4>Product</h4>
               <Link to="/dashboard">Dashboard</Link>
               <Link to="/analytics">Analytics</Link>
-              <Link to="/investments">Portfolio</Link>
+              <Link to="/investments">Investments</Link>
             </div>
-            <div className="link-group">
+            <div className="f-col">
               <h4>Company</h4>
-              <Link to="/about">About Us</Link>
-              <Link to="/careers">Careers</Link>
+              <Link to="/about">About</Link>
               <Link to="/blog">Blog</Link>
+              <Link to="/careers">Careers</Link>
             </div>
-            <div className="link-group">
-              <h4>Resources</h4>
-              <Link to="/docs">Documentation</Link>
-              <Link to="/support">Support</Link>
-              <Link to="/privacy">Privacy Policy</Link>
+            <div className="f-col">
+              <h4>Legal</h4>
+              <Link to="/privacy">Privacy</Link>
+              <Link to="/terms">Terms</Link>
+              <Link to="/security">Security</Link>
             </div>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2026 FinVista Intelligence. All rights reserved.</p>
-          <div className="footer-bottom-links">
-            <span>Terms of Service</span>
-            <span>Cookie Settings</span>
-          </div>
+          <p>© 2026 FinVista Intelligence. Designed with precision.</p>
         </div>
       </footer>
     </div>

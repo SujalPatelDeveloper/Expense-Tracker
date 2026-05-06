@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   LineChart, 
   Line, 
@@ -24,13 +24,21 @@ import {
   Download,
   Info,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  ChevronRight,
+  X
 } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import './Analytics.css';
 
 const Analytics = () => {
   const { transactions, totals } = useTransactions();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const filteredTransactions = useMemo(() => {
+    if (!selectedCategory) return [];
+    return transactions.filter(t => t.category === selectedCategory);
+  }, [transactions, selectedCategory]);
 
   // Process data for charts
   const categoryData = useMemo(() => {
@@ -167,55 +175,90 @@ const Analytics = () => {
           <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
               <PieChart>
-                <Pie
-                  data={categoryData}
-                  innerRadius={70}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
+                  <Pie
+                    data={categoryData}
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    onClick={(data) => setSelectedCategory(data.name === selectedCategory ? null : data.name)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color} 
+                        stroke={selectedCategory === entry.name ? '#fff' : 'none'}
+                        strokeWidth={2}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="category-details">
+              {categoryData.slice(0, 4).map(item => (
+                <div 
+                  key={item.name} 
+                  className={`cat-stat-item ${selectedCategory === item.name ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(item.name === selectedCategory ? null : item.name)}
                 >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="category-details">
-            {categoryData.slice(0, 4).map(item => (
-              <div key={item.name} className="cat-stat-item">
-                <div className="cat-name-box">
-                  <div className="cat-dot" style={{ backgroundColor: item.color }}></div>
-                  <span>{item.name}</span>
+                  <div className="cat-name-box">
+                    <div className="cat-dot" style={{ backgroundColor: item.color }}></div>
+                    <span>{item.name}</span>
+                  </div>
+                  <span className="cat-val">${item.value.toFixed(0)}</span>
                 </div>
-                <span className="cat-val">${item.value.toFixed(0)}</span>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Weekly Spending Bar Chart */}
+          <div className="analytics-card glass-panel">
+            <div className="card-header">
+              <h3>Spending Density</h3>
+            </div>
+            <div style={{ width: '100%', height: 350 }}>
+              <ResponsiveContainer>
+                <BarChart data={dailyTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
+                  />
+                  <Bar dataKey="expense" fill="#f59e0b" radius={[6, 6, 0, 0]} barSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
-        {/* Weekly Spending Bar Chart */}
-        <div className="analytics-card glass-panel">
-          <div className="card-header">
-            <h3>Spending Density</h3>
+        {/* Drill Down Section */}
+        {selectedCategory && (
+          <div className="drill-down-section glass-panel fade-in">
+            <div className="drill-header">
+              <h3>Transactions in <span>{selectedCategory}</span></h3>
+              <button className="close-drill" onClick={() => setSelectedCategory(null)}><X size={18} /></button>
+            </div>
+            <div className="drill-list">
+              {filteredTransactions.map(t => (
+                <div key={t.id} className="drill-item">
+                  <div className="drill-item-left">
+                    <div className="drill-icon"><ChevronRight size={14} /></div>
+                    <div className="drill-info">
+                      <span className="merchant">{t.merchant || t.name}</span>
+                      <span className="date">{t.date}</span>
+                    </div>
+                  </div>
+                  <div className="drill-amount">-${Math.abs(t.amount).toFixed(2)}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ width: '100%', height: 350 }}>
-            <ResponsiveContainer>
-              <BarChart data={dailyTrendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
-                />
-                <Bar dataKey="expense" fill="#f59e0b" radius={[6, 6, 0, 0]} barSize={30} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        )}
       </div>
-    </div>
   );
 };
 

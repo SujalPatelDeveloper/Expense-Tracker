@@ -8,16 +8,22 @@ import {
   CheckCircle2, 
   Clock,
   DollarSign,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  Search
 } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
+import EmptyState from '../components/EmptyState';
 import './Savings.css';
 
 const Savings = () => {
-  const { goals, addGoal, updateGoal, deleteGoal } = useTransactions();
+  const { goals, addGoal, updateGoal, deleteGoal, searchQuery, setSearchQuery } = useTransactions();
   const [isModalOpen, setModalOpen] = useState(false);
   const [editGoal, setEditGoal] = useState(null);
   const [formData, setFormData] = useState({ name: '', target: '', current: '', color: '#f59e0b' });
+
+  const filteredGoals = goals.filter(g => 
+    g.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleOpenModal = (goal = null) => {
     if (goal) {
@@ -46,8 +52,8 @@ const Savings = () => {
     setModalOpen(false);
   };
 
-  const totalTarget = goals.reduce((acc, g) => acc + g.target, 0);
-  const totalSaved = goals.reduce((acc, g) => acc + g.current, 0);
+  const totalTarget = goals.reduce((acc, g) => acc + Number(g.target), 0);
+  const totalSaved = goals.reduce((acc, g) => acc + Number(g.current), 0);
   const overallProgress = totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0;
 
   return (
@@ -58,9 +64,21 @@ const Savings = () => {
             <h1>Savings Plans</h1>
             <p>Set targets and track your journey to financial freedom</p>
           </div>
-          <button className="primary-btn" onClick={() => handleOpenModal()}>
-            <Plus size={18} /> New Goal
-          </button>
+          <div className="header-actions">
+            <div className="header-search glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '8px 16px', gap: '8px' }}>
+              <Search size={18} color="var(--text-muted)" />
+              <input 
+                type="text" 
+                placeholder="Search goals..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-primary)', outline: 'none' }}
+              />
+            </div>
+            <button className="primary-btn" onClick={() => handleOpenModal()}>
+              <Plus size={18} /> New Goal
+            </button>
+          </div>
         </header>
 
         <div className="savings-summary glass-panel">
@@ -83,61 +101,71 @@ const Savings = () => {
           </div>
         </div>
 
-        <div className="goals-grid">
-          {goals.map((goal) => {
-            const percent = Math.min(Math.round((goal.current / goal.target) * 100), 100);
-            return (
-              <div key={goal.id} className="goal-detail-card glass-panel">
-                <div className="goal-card-header">
-                  <div className="goal-icon-box" style={{ backgroundColor: `${goal.color}20`, color: goal.color }}>
-                    <Target size={24} />
-                  </div>
-                  <div className="goal-actions">
-                    <button onClick={() => handleOpenModal(goal)}><Edit2 size={16} /></button>
-                    <button onClick={() => deleteGoal(goal.id)} className="delete"><Trash2 size={16} /></button>
-                  </div>
-                </div>
-                
-                <div className="goal-card-body">
-                  <h3>{goal.name}</h3>
-                  <div className="goal-amounts">
-                    <span className="current">${goal.current.toLocaleString()}</span>
-                    <span className="separator">of</span>
-                    <span className="target">${goal.target.toLocaleString()}</span>
+        {filteredGoals.length === 0 ? (
+          <EmptyState 
+            icon={Target}
+            title={searchQuery ? "No matching goals" : "No savings goals"}
+            message={searchQuery ? `We couldn't find any goal matching "${searchQuery}"` : "Set a target for your dream car, house, or vacation and watch your progress grow."}
+            onAction={searchQuery ? null : () => handleOpenModal()}
+            actionLabel="Create First Goal"
+          />
+        ) : (
+          <div className="goals-grid">
+            {filteredGoals.map((goal) => {
+              const percent = Math.min(Math.round((goal.current / goal.target) * 100), 100);
+              return (
+                <div key={goal.id} className="goal-detail-card glass-panel">
+                  <div className="goal-card-header">
+                    <div className="goal-icon-box" style={{ backgroundColor: `${goal.color}20`, color: goal.color }}>
+                      <Target size={24} />
+                    </div>
+                    <div className="goal-actions">
+                      <button onClick={() => handleOpenModal(goal)}><Edit2 size={16} /></button>
+                      <button onClick={() => deleteGoal(goal.id)} className="delete"><Trash2 size={16} /></button>
+                    </div>
                   </div>
                   
-                  <div className="progress-container">
-                    <div className="progress-info">
-                      <span>Progress</span>
-                      <span>{percent}%</span>
+                  <div className="goal-card-body">
+                    <h3>{goal.name}</h3>
+                    <div className="goal-amounts">
+                      <span className="current">${Number(goal.current).toLocaleString()}</span>
+                      <span className="separator">of</span>
+                      <span className="target">${Number(goal.target).toLocaleString()}</span>
                     </div>
-                    <div className="progress-track">
-                      <div 
-                        className="progress-bar-fill" 
-                        style={{ width: `${percent}%`, backgroundColor: goal.color }}
-                      ></div>
+                    
+                    <div className="progress-container">
+                      <div className="progress-info">
+                        <span>Progress</span>
+                        <span>{percent}%</span>
+                      </div>
+                      <div className="progress-track">
+                        <div 
+                          className="progress-bar-fill" 
+                          style={{ width: `${percent}%`, backgroundColor: goal.color }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="goal-card-footer">
-                  {percent === 100 ? (
-                    <div className="status-badge success">
-                      <CheckCircle2 size={14} /> Completed
-                    </div>
-                  ) : (
-                    <div className="status-badge pending">
-                      <Clock size={14} /> In Progress
-                    </div>
-                  )}
-                  <span className="remaining">
-                    ${(goal.target - goal.current).toLocaleString()} remaining
-                  </span>
+                  <div className="goal-card-footer">
+                    {percent === 100 ? (
+                      <div className="status-badge success">
+                        <CheckCircle2 size={14} /> Completed
+                      </div>
+                    ) : (
+                      <div className="status-badge pending">
+                        <Clock size={14} /> In Progress
+                      </div>
+                    )}
+                    <span className="remaining">
+                      ${(goal.target - goal.current).toLocaleString()} remaining
+                    </span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Goal Modal */}

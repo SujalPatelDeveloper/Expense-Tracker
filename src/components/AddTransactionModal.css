@@ -1,15 +1,3 @@
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.modal-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
 .close-btn {
   color: var(--text-secondary);
   transition: var(--transition-smooth);
@@ -18,12 +6,6 @@
 .close-btn:hover {
   color: var(--accent-danger);
   transform: rotate(90deg);
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
 }
 
 .type-toggle {
@@ -57,18 +39,6 @@
   color: white;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
 .input-wrapper {
   position: relative;
   display: flex;
@@ -81,31 +51,6 @@
   color: var(--text-muted);
 }
 
-.input-wrapper input, .form-group select {
-  width: 100%;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 12px 12px 12px 40px;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 1rem;
-  transition: var(--transition-smooth);
-}
-
-.form-group select {
-  padding-left: 12px;
-}
-
-.input-wrapper input:focus, .form-group select:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 4px var(--accent-primary-glow);
-}
-
-.submit-btn {
-  margin-top: 1rem;
-  width: 100%;
-  justify-content: center;
-  font-size: 1rem;
+.input-wrapper input {
+  padding-left: 40px !important;
 }

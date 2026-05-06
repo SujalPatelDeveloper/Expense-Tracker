@@ -13,27 +13,37 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
+import { useToast } from '../context/ToastContext';
 import './Settings.css';
 
 const Settings = () => {
   const { user, setUser, clearAllData } = useTransactions();
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({ ...user });
   const [showConfirmReset, setShowConfirmReset] = useState(false);
-  const [saveStatus, setSaveStatus] = useState(null);
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
     setUser(formData);
-    setSaveStatus('success');
-    setTimeout(() => setSaveStatus(null), 3000);
+    addToast('Profile updated successfully!', 'success');
   };
 
   const handleResetData = () => {
     clearAllData();
     setShowConfirmReset(false);
-    setSaveStatus('reset');
-    setTimeout(() => setSaveStatus(null), 3000);
+    addToast('All data has been cleared.', 'info');
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, avatar: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const tabs = [
@@ -51,12 +61,6 @@ const Settings = () => {
             <h1>Settings</h1>
             <p>Manage your account and application preferences</p>
           </div>
-          {saveStatus === 'success' && (
-            <div className="save-toast success">Profile updated successfully!</div>
-          )}
-          {saveStatus === 'reset' && (
-            <div className="save-toast warning">All data has been cleared.</div>
-          )}
         </header>
 
         <div className="settings-layout">
@@ -82,8 +86,28 @@ const Settings = () => {
                 <h3>Profile Settings</h3>
                 <form onSubmit={handleSaveProfile} className="settings-form">
                   <div className="profile-upload">
-                    <div className="avatar-large">{formData.name.charAt(0).toUpperCase()}</div>
-                    <button type="button" className="secondary-btn">Change Avatar</button>
+                    <div className="avatar-large">
+                      {formData.avatar ? (
+                        <img src={formData.avatar} alt="Avatar" className="avatar-img" />
+                      ) : (
+                        formData.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div className="avatar-actions">
+                      <label className="secondary-btn cursor-pointer">
+                        Change Avatar
+                        <input type="file" hidden onChange={handleAvatarChange} accept="image/*" />
+                      </label>
+                      {formData.avatar && (
+                        <button 
+                          type="button" 
+                          className="text-btn danger"
+                          onClick={() => setFormData({...formData, avatar: null})}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="form-grid">

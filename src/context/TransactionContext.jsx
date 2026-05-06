@@ -20,17 +20,30 @@ export const TransactionProvider = ({ children }) => {
 
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user_profile');
-    return saved ? JSON.parse(saved) : { name: 'User', plan: 'Pro Member', currency: 'USD' };
+    return saved ? JSON.parse(saved) : { 
+      name: 'User', 
+      plan: 'Pro Member', 
+      currency: 'USD',
+      avatar: null 
+    };
   });
 
   const [goals, setGoals] = useState(() => {
     const saved = localStorage.getItem('savings_goals');
-    return saved ? JSON.parse(saved) : [
-      { id: 1, name: 'New Car', target: 25000, current: 18750, color: '#f59e0b' },
-      { id: 2, name: 'Home Downpayment', target: 50000, current: 15000, color: '#10b981' },
-      { id: 3, name: 'Vacation Fund', target: 5000, current: 4500, color: '#6366f1' }
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
+
+  const [investments, setInvestments] = useState(() => {
+    const saved = localStorage.getItem('investments');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [subscriptions, setSubscriptions] = useState(() => {
+    const saved = localStorage.getItem('subscriptions');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -44,17 +57,13 @@ export const TransactionProvider = ({ children }) => {
     localStorage.setItem('savings_goals', JSON.stringify(goals));
   }, [goals]);
 
-  const addGoal = (goal) => {
-    setGoals([...goals, { ...goal, id: Date.now() }]);
-  };
+  useEffect(() => {
+    localStorage.setItem('investments', JSON.stringify(investments));
+  }, [investments]);
 
-  const updateGoal = (id, updatedGoal) => {
-    setGoals(goals.map(g => g.id === id ? { ...g, ...updatedGoal } : g));
-  };
-
-  const deleteGoal = (id) => {
-    setGoals(goals.filter(g => g.id !== id));
-  };
+  useEffect(() => {
+    localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
+  }, [subscriptions]);
 
   const addTransaction = (transaction) => {
     setTransactions([
@@ -80,6 +89,35 @@ export const TransactionProvider = ({ children }) => {
     setTransactions([]);
   };
 
+  const addGoal = (goal) => {
+    setGoals([...goals, { ...goal, id: Date.now() }]);
+  };
+
+  const updateGoal = (id, data) => {
+    setGoals(goals.map(g => g.id === id ? { ...g, ...data } : g));
+  };
+
+  const deleteGoal = (id) => {
+    setGoals(goals.filter(g => g.id !== id));
+  };
+
+  const addInvestment = (inv) => {
+    setInvestments([...investments, { ...inv, id: Date.now() }]);
+  };
+
+  const deleteInvestment = (id) => {
+    setInvestments(investments.filter(i => i.id !== id));
+  };
+
+  const addSubscription = (sub) => {
+    setSubscriptions([...subscriptions, { ...sub, id: Date.now() }]);
+  };
+
+  const deleteSubscription = (id) => {
+    setSubscriptions(subscriptions.filter(s => s.id !== id));
+  };
+
+  // Calculate Totals
   const totals = transactions.reduce((acc, curr) => {
     if (curr.type === 'income') {
       acc.income += curr.amount;
@@ -89,6 +127,25 @@ export const TransactionProvider = ({ children }) => {
     acc.balance = acc.income - acc.expense;
     return acc;
   }, { income: 0, expense: 0, balance: 0 });
+
+  // Add subscriptions to expenses
+  const monthlySubscriptionTotal = subscriptions.reduce((acc, sub) => {
+    return acc + (sub.cycle === 'Monthly' ? sub.amount : sub.amount / 12);
+  }, 0);
+  
+  totals.expense += monthlySubscriptionTotal;
+  totals.balance = totals.income - totals.expense;
+
+  // Calculate Net Worth
+  const totalSavings = goals.reduce((acc, g) => acc + g.current, 0);
+  const totalInvestments = investments.reduce((acc, i) => acc + i.amount, 0);
+  totals.netWorth = totals.balance + totalSavings + totalInvestments;
+  totals.totalSavings = totalSavings;
+  totals.totalInvestments = totalInvestments;
+
+  const editSubscription = (updatedSub) => {
+    setSubscriptions(prev => prev.map(s => s.id === updatedSub.id ? updatedSub : s));
+  };
 
   return (
     <TransactionContext.Provider value={{ 
@@ -103,6 +160,15 @@ export const TransactionProvider = ({ children }) => {
       addGoal,
       updateGoal,
       deleteGoal,
+      investments,
+      addInvestment,
+      deleteInvestment,
+      editSubscription,
+      subscriptions,
+      addSubscription,
+      deleteSubscription,
+      searchQuery,
+      setSearchQuery,
       totals 
     }}>
       {children}

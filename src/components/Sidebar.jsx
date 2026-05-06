@@ -73,7 +73,13 @@ const Sidebar = ({ closeSidebar }) => {
           </button>
         </div>
         <div className="user-profile">
-          <div className="avatar">{user.name.charAt(0).toUpperCase()}</div>
+          <div className="avatar">
+            {user.avatar ? (
+              <img src={user.avatar} alt="Avatar" className="sidebar-avatar-img" />
+            ) : (
+              user.name.charAt(0).toUpperCase()
+            )}
+          </div>
           <div className="user-info">
             <span className="user-name">{user.name}</span>
             <span className="user-plan">{user.plan}</span>

@@ -11,17 +11,18 @@ import {
   Plus,
   Edit2,
   Trash2,
-  AlertCircle
+  AlertCircle,
+  DollarSign
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useTransactions } from '../context/TransactionContext';
 import AddTransactionModal from '../components/AddTransactionModal';
+import EmptyState from '../components/EmptyState';
 import './Transactions.css';
 
 const Transactions = () => {
-  const { transactions, deleteTransaction } = useTransactions();
-  const [searchTerm, setSearchTerm] = useState('');
+  const { transactions, deleteTransaction, searchQuery, setSearchQuery } = useTransactions();
   const [isModalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -46,8 +47,8 @@ const Transactions = () => {
   }, []);
 
   const filteredTransactions = transactions.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (t.text?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+    (t.category?.toLowerCase() || '').includes(searchQuery.toLowerCase())
   );
 
   const handleEdit = (transaction) => {
@@ -168,8 +169,8 @@ const Transactions = () => {
             <input 
               type="text" 
               placeholder="Search transactions..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="filter-actions">
@@ -184,80 +185,86 @@ const Transactions = () => {
         </div>
 
         <div className="table-container glass-panel">
-          <table className="transactions-table">
-            <thead>
-              <tr>
-                <th>Transaction</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Amount</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredTransactions.map((t) => (
-                <tr key={t.id}>
-                  <td>
-                    <div className="transaction-info">
-                      <div className={`type-icon ${t.type}`}>
-                        {t.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
-                      </div>
-                      <span className="transaction-name">{t.name}</span>
-                    </div>
-                  </td>
-                  <td><span className="category-tag">{t.category}</span></td>
-                  <td><span className="date-text">{t.date}</span></td>
-                  <td>
-                    <span className={`status-pill ${t.status?.toLowerCase() || 'completed'}`}>
-                      {t.status || 'Completed'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`amount-text ${t.type}`}>
-                      {t.type === 'income' ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
-                    </span>
-                  </td>
-                  <td className="actions-cell">
-                    <div className="menu-container" ref={activeMenuId === t.id ? menuRef : null}>
-                      <button 
-                        className="more-btn" 
-                        onClick={() => setActiveMenuId(activeMenuId === t.id ? null : t.id)}
-                      >
-                        <MoreHorizontal size={18} />
-                      </button>
-                      
-                      {activeMenuId === t.id && (
-                        <div className="action-menu glass-panel fade-in">
-                          <button onClick={() => handleEdit(t)} className="menu-item">
-                            <Edit2 size={14} /> Edit
-                          </button>
-                          <button onClick={() => setDeleteConfirmId(t.id)} className="menu-item delete">
-                            <Trash2 size={14} /> Delete
-                          </button>
+          {filteredTransactions.length === 0 ? (
+            <EmptyState 
+              icon={DollarSign}
+              title={searchQuery ? "No matching transactions" : "No transactions found"}
+              message={searchQuery ? `We couldn't find anything for "${searchQuery}"` : "Your financial history is empty. Start by adding your first income or expense."}
+              onAction={searchQuery ? null : openAddModal}
+              actionLabel="Add Transaction"
+            />
+          ) : (
+            <>
+              <table className="transactions-table">
+                <thead>
+                  <tr>
+                    <th>Transaction</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredTransactions.map((t) => (
+                    <tr key={t.id}>
+                      <td>
+                        <div className="transaction-info">
+                          <div className={`type-icon ${t.type}`}>
+                            {t.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                          </div>
+                          <span className="transaction-name">{t.name}</span>
                         </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      </td>
+                      <td><span className="category-tag">{t.category}</span></td>
+                      <td><span className="date-text">{t.date}</span></td>
+                      <td>
+                        <span className={`status-pill ${t.status?.toLowerCase() || 'completed'}`}>
+                          {t.status || 'Completed'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`amount-text ${t.type}`}>
+                          {t.type === 'income' ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
+                        </span>
+                      </td>
+                      <td className="actions-cell">
+                        <div className="menu-container" ref={activeMenuId === t.id ? menuRef : null}>
+                          <button 
+                            className="more-btn" 
+                            onClick={() => setActiveMenuId(activeMenuId === t.id ? null : t.id)}
+                          >
+                            <MoreHorizontal size={18} />
+                          </button>
+                          
+                          {activeMenuId === t.id && (
+                            <div className="action-menu glass-panel fade-in">
+                              <button onClick={() => handleEdit(t)} className="menu-item">
+                                <Edit2 size={14} /> Edit
+                              </button>
+                              <button onClick={() => setDeleteConfirmId(t.id)} className="menu-item delete">
+                                <Trash2 size={14} /> Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
-          {filteredTransactions.length === 0 && (
-            <div className="empty-state">
-              <p>No transactions found matching your search.</p>
-            </div>
+              <div className="pagination">
+                <span className="pagination-info">Showing {filteredTransactions.length} of {transactions.length} transactions</span>
+                <div className="pagination-btns">
+                  <button className="page-btn disabled"><ChevronLeft size={18} /></button>
+                  <button className="page-btn active">1</button>
+                  <button className="page-btn"><ChevronRight size={18} /></button>
+                </div>
+              </div>
+            </>
           )}
-
-          <div className="pagination">
-            <span className="pagination-info">Showing {filteredTransactions.length} of {transactions.length} transactions</span>
-            <div className="pagination-btns">
-              <button className="page-btn disabled"><ChevronLeft size={18} /></button>
-              <button className="page-btn active">1</button>
-              <button className="page-btn"><ChevronRight size={18} /></button>
-            </div>
-          </div>
         </div>
       </div>
 
