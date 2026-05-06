@@ -79,6 +79,11 @@
   color: var(--accent-primary);
 }
 
+.nav-signin {
+  font-weight: 600;
+  color: var(--text-primary) !important;
+}
+
 .nav-cta {
   background: var(--accent-primary);
   color: white !important;

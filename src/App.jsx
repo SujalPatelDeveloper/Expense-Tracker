@@ -11,6 +11,7 @@ import Settings from './pages/Settings';
 import Savings from './pages/Savings';
 import Investments from './pages/Investments';
 import Subscriptions from './pages/Subscriptions';
+import Login from './pages/Login';
 import { TransactionProvider } from './context/TransactionContext';
 import { ToastProvider } from './context/ToastContext';
 import './index.css';
@@ -19,13 +20,13 @@ import './App.css';
 const Layout = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const isLanding = location.pathname === '/';
+  const isAuthPage = location.pathname === '/' || location.pathname === '/login';
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className={`app-container ${isLanding ? 'landing-mode' : ''}`}>
-      {!isLanding && (
+    <div className={`app-container ${isAuthPage ? 'landing-mode' : ''}`}>
+      {!isAuthPage && (
         <>
           <button className="mobile-menu-btn" onClick={toggleSidebar}>
             {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -39,7 +40,7 @@ const Layout = ({ children }) => {
         </>
       )}
       
-      <main className={`main-content ${isLanding ? 'full-width' : ''}`}>
+      <main className={`main-content ${isAuthPage ? 'full-width' : ''}`}>
         {children}
       </main>
     </div>
@@ -54,6 +55,7 @@ function App() {
           <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/about" element={<About />} />

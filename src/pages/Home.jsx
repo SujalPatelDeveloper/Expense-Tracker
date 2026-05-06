@@ -43,6 +43,7 @@ const Landing = () => {
         <div className="nav-links">
           <Link to="/about">Features</Link>
           <Link to="/dashboard">Dashboard</Link>
+          <Link to="/login" className="nav-signin">Sign In</Link>
           <button className="theme-toggle-landing" onClick={toggleTheme}>
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
