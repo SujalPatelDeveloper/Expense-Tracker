@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   AreaChart, 
   Area, 
@@ -34,13 +35,8 @@ import AddTransactionModal from '../components/AddTransactionModal';
 import CountUp from '../components/CountUp';
 import './Dashboard.css';
 
-const currencies = [
-  { code: 'USD', name: 'US Dollar', balance: '0.00', status: 'Active', flag: '🇺🇸' },
-  { code: 'EUR', name: 'Euro', balance: '0.00', status: 'Active', flag: '🇪🇺' },
-  { code: 'GBP', name: 'British Pound', balance: '0.00', status: 'Inactive', flag: '🇬🇧' },
-];
-
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { transactions, totals, goals, user, searchQuery, setSearchQuery } = useTransactions();
   const [isDark, setIsDark] = useState(true);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -267,26 +263,32 @@ const Dashboard = () => {
             <div className="section-card glass-panel">
               <div className="section-header">
                 <h3>Quick Actions</h3>
-                <button className="add-btn-small" onClick={() => setModalOpen(true)}>
-                  <Plus size={14} /> Add Transaction
-                </button>
               </div>
-              <div className="currency-list">
-                {currencies.map((curr) => (
-                  <div key={curr.code} className="currency-card">
-                    <div className="curr-info">
-                      <span className="curr-flag">{curr.flag}</span>
-                      <div>
-                        <span className="curr-code">{curr.code}</span>
-                        <span className="curr-name">{curr.name}</span>
-                      </div>
-                    </div>
-                    <div className="curr-balance">
-                      <span className="balance-val">${curr.balance}</span>
-                      <span className={`status ${curr.status.toLowerCase()}`}>{curr.status}</span>
-                    </div>
+              <div className="quick-actions-grid">
+                <button className="action-item" onClick={() => setModalOpen(true)}>
+                  <div className="action-icon income">
+                    <ArrowUpRight size={20} />
                   </div>
-                ))}
+                  <span>Add Income</span>
+                </button>
+                <button className="action-item" onClick={() => setModalOpen(true)}>
+                  <div className="action-icon expense">
+                    <ArrowDownRight size={20} />
+                  </div>
+                  <span>Add Expense</span>
+                </button>
+                <button className="action-item" onClick={() => navigate('/savings')}>
+                  <div className="action-icon goals">
+                    <Target size={20} />
+                  </div>
+                  <span>Set Goal</span>
+                </button>
+                <button className="action-item" onClick={() => navigate('/transactions')}>
+                  <div className="action-icon export">
+                    <TrendingUp size={20} />
+                  </div>
+                  <span>All History</span>
+                </button>
               </div>
             </div>
           </div>

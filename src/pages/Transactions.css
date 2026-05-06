@@ -282,3 +282,94 @@
 .delete-btn:hover {
   box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3);
 }
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .table-controls {
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: stretch;
+    padding: 1.25rem;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .filter-actions {
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .filter-btn, .sort-select {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .transactions-container {
+    padding: 0;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 0 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .header-actions button, .export-dropdown-container {
+    width: 100%;
+  }
+
+  .header-actions .primary-btn, .header-actions .secondary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .transactions-table {
+    min-width: 600px;
+  }
+
+  .transactions-table th, .transactions-table td {
+    padding: 1rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+
+  .pagination-btns {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .table-controls {
+    border-radius: 0;
+  }
+}

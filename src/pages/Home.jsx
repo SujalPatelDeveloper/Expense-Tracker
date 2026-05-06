@@ -126,7 +126,7 @@ const Landing = () => {
 
       {/* Features Section */}
       <section className="features-landing">
-        <div className="section-header">
+        <div className="landing-section-header">
           <span className="section-badge">Core Capabilities</span>
           <h2>Intelligent tools for <br />the modern investor</h2>
         </div>

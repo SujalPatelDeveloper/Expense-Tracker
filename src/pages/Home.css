@@ -286,9 +286,9 @@
   padding: 8rem 8rem;
 }
 
-.section-header {
+.landing-section-header {
   text-align: center;
-  margin-bottom: 5rem;
+  margin-bottom: 4rem;
   max-width: 900px;
   margin-left: auto;
   margin-right: auto;
@@ -490,11 +490,36 @@
   box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
 }
 
-@media (max-width: 1200px) {
-  .hero-landing { padding: 4rem; grid-template-columns: 1fr; text-align: center; }
-  .hero-subtitle { margin: 0 auto 3rem auto; }
+@media (max-width: 1024px) {
+  .landing-nav { margin: 1rem 0.5rem; padding: 0.75rem 1rem; }
+  .nav-logo { font-size: 1.1rem; gap: 8px; }
+  .nav-logo svg { width: 20px; height: 20px; }
+  .nav-cta { padding: 8px 16px; font-size: 0.85rem; }
+  .hero-landing { padding: 4rem 1rem; grid-template-columns: 1fr; text-align: center; }
+  .hero-landing h1 { font-size: 2.75rem; }
+  .hero-subtitle { margin: 0 auto 2.5rem auto; font-size: 1.1rem; }
   .hero-cta { align-items: center; }
   .hero-visual { display: none; }
-  .landing-stats { margin: 0 2rem; grid-template-columns: 1fr 1fr; }
-  .landing-cta-box { margin: 2rem; padding: 3rem; }
+  .landing-stats { margin: 0 1rem; grid-template-columns: repeat(2, 1fr); padding: 2rem 1rem; }
+  .features-landing { padding: 4rem 1rem; }
+  .landing-section-header { margin-bottom: 2.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .features-landing h2 { font-size: 2rem; margin-top: 1rem; }
+  .landing-cta-box { margin: 1rem; padding: 4rem 1.5rem; }
+  .landing-cta-box h2 { font-size: 2.2rem; }
+  .landing-footer { padding: 4rem 1.5rem 2rem 1.5rem; }
+  .footer-top { flex-direction: column; gap: 3rem; }
+  .footer-links-grid { gap: 2rem; flex-wrap: wrap; }
+}
+
+@media (max-width: 640px) {
+  .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links { gap: 0.75rem; }
+  .landing-stats { grid-template-columns: 1fr; gap: 2rem; }
+  .cta-btns { flex-direction: column; width: 100%; gap: 1rem; }
+  .cta-btns a, .cta-btns button { width: 100%; justify-content: center; }
+  .hero-landing h1 { font-size: 2.2rem; letter-spacing: -1px; }
+  .hero-announcement { display: none; }
+  .footer-links-grid { grid-template-columns: repeat(2, 1fr); display: grid; gap: 2rem; }
+  .features-landing h2 { font-size: 1.7rem; }
+  .landing-cta-box h2 { font-size: 1.7rem; }
 }

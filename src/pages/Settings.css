@@ -298,37 +298,93 @@ input:checked + .slider:before {
 @media (max-width: 1024px) {
   .settings-layout {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   
   .settings-tabs {
     flex-direction: row;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding: 0.75rem;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .settings-tabs::-webkit-scrollbar {
+    display: none;
   }
   
   .tab-link {
     width: auto;
     white-space: nowrap;
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
   
   .tab-link .chevron {
     display: none;
   }
+
+  .settings-content {
+    padding: 1.5rem;
+    min-height: auto;
+  }
 }
 
 @media (max-width: 768px) {
+  .profile-upload {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.25rem;
+  }
+
+  .avatar-actions {
+    width: 100%;
+    align-items: center;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
   
   .danger-zone {
     flex-direction: column;
     gap: 1.5rem;
     text-align: center;
+    padding: 1.5rem;
   }
   
   .danger-info {
     flex-direction: column;
     max-width: 100%;
+  }
+
+  .danger-info div {
+    text-align: center;
+  }
+
+  .settings-form .primary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pref-item {
+    padding: 1.25rem;
+    gap: 15px;
+  }
+
+  .confirm-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .tab-pane h3 {
+    font-size: 1.25rem;
   }
 }

@@ -187,6 +187,70 @@
   }
   
   .portfolio-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-box, .header-actions button {
+    width: 100%;
+  }
+
+  .header-actions .primary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .portfolio-summary-grid {
     grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  .summary-card {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .summary-card .value {
+    font-size: 1.5rem;
+  }
+
+  .investments-main-grid {
+    padding: 0 1rem;
+  }
+
+  .assets-table-section {
+    padding: 1rem;
+  }
+
+  .assets-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .assets-table {
+    min-width: 500px;
+  }
+
+  .asset-distribution {
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.75rem;
   }
 }

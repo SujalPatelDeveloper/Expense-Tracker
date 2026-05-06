@@ -223,13 +223,70 @@
   box-shadow: 0 0 0 2px var(--bg-primary);
 }
 
+@media (max-width: 1024px) {
+  .goals-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .header-search, .header-actions button {
+    width: 100%;
+  }
+
+  .header-actions .primary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .savings-summary {
+    padding: 1.5rem;
+    margin: 0 1rem 2rem 1rem;
+  }
+
   .summary-info {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
   }
   
   .summary-item .value {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  .goals-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  .goal-detail-card {
+    padding: 1.25rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .goal-amounts .current {
+    font-size: 1.25rem;
   }
 }
