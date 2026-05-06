@@ -176,3 +176,10 @@
 .page-btn.active { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
 .page-btn:hover:not(.disabled):not(.active) { background: var(--bg-tertiary); color: white; }
 .page-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+
+.empty-state {
+  padding: 4rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}

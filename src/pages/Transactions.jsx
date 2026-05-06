@@ -7,23 +7,22 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Plus
 } from 'lucide-react';
+import { useTransactions } from '../context/TransactionContext';
+import AddTransactionModal from '../components/AddTransactionModal';
 import './Transactions.css';
 
-const transactions = [
-  { id: 1, name: 'Apple Store', category: 'Tech', amount: -1299.00, date: 'May 04, 2026', status: 'Completed', type: 'expense' },
-  { id: 2, name: 'Stripe Payout', category: 'Salary', amount: 4500.00, date: 'May 03, 2026', status: 'Completed', type: 'income' },
-  { id: 3, name: 'Starbucks', category: 'Food', amount: -12.50, date: 'May 03, 2026', status: 'Pending', type: 'expense' },
-  { id: 4, name: 'Netflix Subscription', category: 'Entertainment', amount: -15.99, date: 'May 02, 2026', status: 'Completed', type: 'expense' },
-  { id: 5, name: 'Uber Trip', category: 'Transport', amount: -24.50, date: 'May 02, 2026', status: 'Completed', type: 'expense' },
-  { id: 6, name: 'Freelance Work', category: 'Income', amount: 850.00, date: 'May 01, 2026', status: 'Completed', type: 'income' },
-  { id: 7, name: 'Gym Membership', category: 'Health', amount: -50.00, date: 'Apr 30, 2026', status: 'Completed', type: 'expense' },
-  { id: 8, name: 'Amazon Purchase', category: 'Shopping', amount: -89.99, date: 'Apr 29, 2026', status: 'Completed', type: 'expense' },
-];
-
 const Transactions = () => {
+  const { transactions, deleteTransaction } = useTransactions();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const filteredTransactions = transactions.filter(t => 
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="transactions-container fade-in">
@@ -33,6 +32,9 @@ const Transactions = () => {
           <p>Monitor and manage your financial activity</p>
         </div>
         <div className="header-actions">
+          <button className="primary-btn" onClick={() => setModalOpen(true)}>
+            <Plus size={18} /> Add Transaction
+          </button>
           <button className="secondary-btn"><Download size={18} /> Export</button>
         </div>
       </header>
@@ -71,7 +73,7 @@ const Transactions = () => {
             </tr>
           </thead>
           <tbody>
-            {transactions.map((t) => (
+            {filteredTransactions.map((t) => (
               <tr key={t.id}>
                 <td>
                   <div className="transaction-info">
@@ -84,8 +86,8 @@ const Transactions = () => {
                 <td><span className="category-tag">{t.category}</span></td>
                 <td><span className="date-text">{t.date}</span></td>
                 <td>
-                  <span className={`status-pill ${t.status.toLowerCase()}`}>
-                    {t.status}
+                  <span className={`status-pill ${t.status?.toLowerCase() || 'completed'}`}>
+                    {t.status || 'Completed'}
                   </span>
                 </td>
                 <td>
@@ -94,24 +96,35 @@ const Transactions = () => {
                   </span>
                 </td>
                 <td>
-                  <button className="more-btn"><MoreHorizontal size={18} /></button>
+                  <button className="more-btn" onClick={() => deleteTransaction(t.id)}>
+                    <MoreHorizontal size={18} />
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
+        {filteredTransactions.length === 0 && (
+          <div className="empty-state">
+            <p>No transactions found matching your search.</p>
+          </div>
+        )}
+
         <div className="pagination">
-          <span className="pagination-info">Showing 1-8 of 24 transactions</span>
+          <span className="pagination-info">Showing {filteredTransactions.length} of {transactions.length} transactions</span>
           <div className="pagination-btns">
             <button className="page-btn disabled"><ChevronLeft size={18} /></button>
             <button className="page-btn active">1</button>
-            <button className="page-btn">2</button>
-            <button className="page-btn">3</button>
             <button className="page-btn"><ChevronRight size={18} /></button>
           </div>
         </div>
       </div>
+
+      <AddTransactionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setModalOpen(false)} 
+      />
     </div>
   );
 };

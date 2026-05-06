@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import Transactions from './pages/Transactions';
+import { TransactionProvider } from './context/TransactionContext';
 import './index.css';
 import './App.css';
 
@@ -41,16 +42,18 @@ const Layout = ({ children }) => {
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/transactions" element={<Transactions />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <TransactionProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/transactions" element={<Transactions />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </TransactionProvider>
   );
 }
 

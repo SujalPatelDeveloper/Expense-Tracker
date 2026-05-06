@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   AreaChart, 
   Area, 
@@ -29,6 +29,8 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
+import { useTransactions } from '../context/TransactionContext';
+import AddTransactionModal from '../components/AddTransactionModal';
 import './Dashboard.css';
 
 const cashFlowData = [
@@ -55,7 +57,9 @@ const currencies = [
 ];
 
 const Dashboard = () => {
-  const [isDark, setIsDark] = React.useState(true);
+  const { totals } = useTransactions();
+  const [isDark, setIsDark] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const toggleTheme = () => {
     const newTheme = !isDark;
@@ -132,35 +136,35 @@ const Dashboard = () => {
               <span>+2.4%</span>
             </div>
           </div>
-          <div className="metric-value">$84,250.00</div>
+          <div className="metric-value">${totals.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <div className="sparkline-placeholder"></div>
-          <p className="metric-subtext">Across 4 connected accounts</p>
+          <p className="metric-subtext">Current Wallet Balance</p>
         </div>
 
         <div className="metric-card glass-panel">
           <div className="metric-header">
-            <span className="metric-title">Monthly Savings</span>
+            <span className="metric-title">Monthly Income</span>
             <div className="metric-trend up">
               <TrendingUp size={14} />
               <span>+8.1%</span>
             </div>
           </div>
-          <div className="metric-value">$12,840.00</div>
+          <div className="metric-value">${totals.income.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <div className="sparkline-placeholder"></div>
-          <p className="metric-subtext">Target: $15,000.00</p>
+          <p className="metric-subtext">Total deposits this month</p>
         </div>
 
         <div className="metric-card glass-panel">
           <div className="metric-header">
-            <span className="metric-title">Investments</span>
+            <span className="metric-title">Total Expenses</span>
             <div className="metric-trend down">
               <TrendingDown size={14} />
               <span>-0.5%</span>
             </div>
           </div>
-          <div className="metric-value">$54,200.00</div>
+          <div className="metric-value">${totals.expense.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <div className="sparkline-placeholder"></div>
-          <p className="metric-subtext">Market value as of today</p>
+          <p className="metric-subtext">Total spending this month</p>
         </div>
       </section>
 
@@ -200,8 +204,10 @@ const Dashboard = () => {
 
           <div className="section-card glass-panel">
             <div className="section-header">
-              <h3>Recent Wallets</h3>
-              <button className="add-btn-small"><Plus size={14} /> Add Wallet</button>
+              <h3>Quick Actions</h3>
+              <button className="add-btn-small" onClick={() => setModalOpen(true)}>
+                <Plus size={14} /> Add Transaction
+              </button>
             </div>
             <div className="currency-list">
               {currencies.map((curr) => (
@@ -250,7 +256,7 @@ const Dashboard = () => {
               </div>
               <div className="radial-center-text">
                 <span className="label">Total Spent</span>
-                <span className="value">$4,250</span>
+                <span className="value">${totals.expense.toFixed(0)}</span>
               </div>
             </div>
             <div className="category-legend">
@@ -312,6 +318,11 @@ const Dashboard = () => {
           <span>Support</span>
         </div>
       </footer>
+
+      <AddTransactionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setModalOpen(false)} 
+      />
     </div>
   );
 };
