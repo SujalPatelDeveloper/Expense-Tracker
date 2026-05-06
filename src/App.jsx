@@ -6,6 +6,9 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import Transactions from './pages/Transactions';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
+import Savings from './pages/Savings';
 import { TransactionProvider } from './context/TransactionContext';
 import './index.css';
 import './App.css';
@@ -48,8 +51,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/about" element={<About />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/savings" element={<Savings />} />
           </Routes>
         </Layout>
       </Router>

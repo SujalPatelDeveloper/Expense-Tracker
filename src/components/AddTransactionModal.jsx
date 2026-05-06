@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, DollarSign, Tag, Calendar, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import './AddTransactionModal.css';
 
-const AddTransactionModal = ({ isOpen, onClose }) => {
-  const { addTransaction } = useTransactions();
+const AddTransactionModal = ({ isOpen, onClose, editData = null }) => {
+  const { addTransaction, updateTransaction } = useTransactions();
   const [formData, setFormData] = useState({
     name: '',
     amount: '',
@@ -12,18 +12,36 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
     type: 'expense'
   });
 
+  useEffect(() => {
+    if (editData) {
+      setFormData({
+        name: editData.name,
+        amount: Math.abs(editData.amount),
+        category: editData.category,
+        type: editData.type
+      });
+    } else {
+      setFormData({ name: '', amount: '', category: 'Lifestyle', type: 'expense' });
+    }
+  }, [editData, isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.amount) return;
 
-    addTransaction({
+    const transactionData = {
       ...formData,
       amount: formData.type === 'expense' ? -Math.abs(Number(formData.amount)) : Math.abs(Number(formData.amount))
-    });
+    };
+
+    if (editData) {
+      updateTransaction(editData.id, transactionData);
+    } else {
+      addTransaction(transactionData);
+    }
     
-    setFormData({ name: '', amount: '', category: 'Lifestyle', type: 'expense' });
     onClose();
   };
 
@@ -31,7 +49,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
     <div className="modal-overlay">
       <div className="modal-container glass-panel fade-in">
         <div className="modal-header">
-          <h2>Add Transaction</h2>
+          <h2>{editData ? 'Edit Transaction' : 'Add Transaction'}</h2>
           <button onClick={onClose} className="close-btn"><X size={20} /></button>
         </div>
 
@@ -101,7 +119,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
           </div>
 
           <button type="submit" className="submit-btn primary-btn">
-            Add Transaction
+            {editData ? 'Save Changes' : 'Add Transaction'}
           </button>
         </form>
       </div>

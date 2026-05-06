@@ -14,9 +14,11 @@ import {
   Moon,
   X
 } from 'lucide-react';
+import { useTransactions } from '../context/TransactionContext';
 import './Sidebar.css';
 
 const Sidebar = ({ closeSidebar }) => {
+  const { user } = useTransactions();
   const [isDark, setIsDark] = React.useState(true);
 
   const toggleTheme = () => {
@@ -71,10 +73,10 @@ const Sidebar = ({ closeSidebar }) => {
           </button>
         </div>
         <div className="user-profile">
-          <div className="avatar">AD</div>
+          <div className="avatar">{user.name.charAt(0).toUpperCase()}</div>
           <div className="user-info">
-            <span className="user-name">Alex Dawson</span>
-            <span className="user-plan">Wealth Master</span>
+            <span className="user-name">{user.name}</span>
+            <span className="user-plan">{user.plan}</span>
           </div>
         </div>
       </div>

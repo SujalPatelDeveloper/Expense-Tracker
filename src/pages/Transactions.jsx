@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -8,8 +8,13 @@ import {
   ArrowDownLeft,
   ChevronLeft,
   ChevronRight,
-  Plus
+  Plus,
+  Edit2,
+  Trash2,
+  AlertCircle
 } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useTransactions } from '../context/TransactionContext';
 import AddTransactionModal from '../components/AddTransactionModal';
 import './Transactions.css';
@@ -18,105 +23,240 @@ const Transactions = () => {
   const { transactions, deleteTransaction } = useTransactions();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [activeMenuId, setActiveMenuId] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [isExportOpen, setExportOpen] = useState(false);
+  
+  const menuRef = useRef(null);
+  const exportRef = useRef(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setActiveMenuId(null);
+      }
+      if (exportRef.current && !exportRef.current.contains(event.target)) {
+        setExportOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filteredTransactions = transactions.filter(t => 
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleEdit = (transaction) => {
+    setEditData(transaction);
+    setModalOpen(true);
+    setActiveMenuId(null);
+  };
+
+  const openAddModal = () => {
+    setEditData(null);
+    setModalOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    deleteTransaction(id);
+    setDeleteConfirmId(null);
+  };
+
+  const handleExportCSV = () => {
+    if (transactions.length === 0) return;
+
+    const headers = ['Name', 'Category', 'Date', 'Type', 'Amount', 'Status'];
+    const csvRows = [
+      headers.join(','),
+      ...transactions.map(t => [
+        `"${t.name}"`,
+        `"${t.category}"`,
+        t.date,
+        t.type,
+        t.amount.toFixed(2),
+        t.status || 'Completed'
+      ].join(','))
+    ];
+
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `FinVista_Transactions_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setExportOpen(false);
+  };
+
+  const handleExportPDF = () => {
+    if (transactions.length === 0) return;
+
+    const doc = new jsPDF();
+    
+    // Add Title
+    doc.setFontSize(20);
+    doc.setTextColor(40);
+    doc.text('FinVista - Transaction Report', 14, 22);
+    
+    // Add date range info
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    
+    const tableData = transactions.map(t => [
+      t.name,
+      t.category,
+      t.date,
+      t.type.toUpperCase(),
+      `${t.type === 'income' ? '+' : '-'}$${Math.abs(t.amount).toFixed(2)}`,
+      t.status || 'Completed'
+    ]);
+
+    autoTable(doc, {
+      head: [['Transaction', 'Category', 'Date', 'Type', 'Amount', 'Status']],
+      body: tableData,
+      startY: 40,
+      theme: 'striped',
+      headStyles: { fillColor: [245, 158, 11] }, // Amber primary color
+      alternateRowStyles: { fillColor: [248, 250, 252] }
+    });
+
+    doc.save(`FinVista_Transactions_${new Date().toISOString().split('T')[0]}.pdf`);
+    setExportOpen(false);
+  };
+
   return (
-    <div className="transactions-container fade-in">
-      <header className="page-header">
-        <div>
-          <h1>Transactions</h1>
-          <p>Monitor and manage your financial activity</p>
-        </div>
-        <div className="header-actions">
-          <button className="primary-btn" onClick={() => setModalOpen(true)}>
-            <Plus size={18} /> Add Transaction
-          </button>
-          <button className="secondary-btn"><Download size={18} /> Export</button>
-        </div>
-      </header>
-
-      <div className="table-controls glass-panel">
-        <div className="search-bar">
-          <Search size={18} className="search-icon" />
-          <input 
-            type="text" 
-            placeholder="Search transactions..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="filter-actions">
-          <button className="filter-btn"><Filter size={18} /> Filter</button>
-          <select className="sort-select">
-            <option>Newest First</option>
-            <option>Oldest First</option>
-            <option>Highest Amount</option>
-            <option>Lowest Amount</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="table-container glass-panel">
-        <table className="transactions-table">
-          <thead>
-            <tr>
-              <th>Transaction</th>
-              <th>Category</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Amount</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTransactions.map((t) => (
-              <tr key={t.id}>
-                <td>
-                  <div className="transaction-info">
-                    <div className={`type-icon ${t.type}`}>
-                      {t.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
-                    </div>
-                    <span className="transaction-name">{t.name}</span>
-                  </div>
-                </td>
-                <td><span className="category-tag">{t.category}</span></td>
-                <td><span className="date-text">{t.date}</span></td>
-                <td>
-                  <span className={`status-pill ${t.status?.toLowerCase() || 'completed'}`}>
-                    {t.status || 'Completed'}
-                  </span>
-                </td>
-                <td>
-                  <span className={`amount-text ${t.type}`}>
-                    {t.type === 'income' ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
-                  </span>
-                </td>
-                <td>
-                  <button className="more-btn" onClick={() => deleteTransaction(t.id)}>
-                    <MoreHorizontal size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {filteredTransactions.length === 0 && (
-          <div className="empty-state">
-            <p>No transactions found matching your search.</p>
+    <div className="transactions-container">
+      <div className="fade-in">
+        <header className="page-header">
+          <div>
+            <h1>Transactions</h1>
+            <p>Monitor and manage your financial activity</p>
           </div>
-        )}
+          <div className="header-actions">
+            <button className="primary-btn" onClick={openAddModal}>
+              <Plus size={18} /> Add Transaction
+            </button>
+            <div className="export-dropdown-container" ref={exportRef}>
+              <button className="secondary-btn" onClick={() => setExportOpen(!isExportOpen)}>
+                <Download size={18} /> Export Data
+              </button>
+              {isExportOpen && (
+                <div className="action-menu export-menu glass-panel fade-in">
+                  <button onClick={handleExportCSV} className="menu-item">
+                    CSV File (.csv)
+                  </button>
+                  <button onClick={handleExportPDF} className="menu-item">
+                    PDF Document (.pdf)
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
-        <div className="pagination">
-          <span className="pagination-info">Showing {filteredTransactions.length} of {transactions.length} transactions</span>
-          <div className="pagination-btns">
-            <button className="page-btn disabled"><ChevronLeft size={18} /></button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn"><ChevronRight size={18} /></button>
+        <div className="table-controls glass-panel">
+          <div className="search-bar">
+            <Search size={18} className="search-icon" />
+            <input 
+              type="text" 
+              placeholder="Search transactions..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="filter-actions">
+            <button className="filter-btn"><Filter size={18} /> Filter</button>
+            <select className="sort-select">
+              <option>Newest First</option>
+              <option>Oldest First</option>
+              <option>Highest Amount</option>
+              <option>Lowest Amount</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="table-container glass-panel">
+          <table className="transactions-table">
+            <thead>
+              <tr>
+                <th>Transaction</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTransactions.map((t) => (
+                <tr key={t.id}>
+                  <td>
+                    <div className="transaction-info">
+                      <div className={`type-icon ${t.type}`}>
+                        {t.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                      </div>
+                      <span className="transaction-name">{t.name}</span>
+                    </div>
+                  </td>
+                  <td><span className="category-tag">{t.category}</span></td>
+                  <td><span className="date-text">{t.date}</span></td>
+                  <td>
+                    <span className={`status-pill ${t.status?.toLowerCase() || 'completed'}`}>
+                      {t.status || 'Completed'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`amount-text ${t.type}`}>
+                      {t.type === 'income' ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
+                    </span>
+                  </td>
+                  <td className="actions-cell">
+                    <div className="menu-container" ref={activeMenuId === t.id ? menuRef : null}>
+                      <button 
+                        className="more-btn" 
+                        onClick={() => setActiveMenuId(activeMenuId === t.id ? null : t.id)}
+                      >
+                        <MoreHorizontal size={18} />
+                      </button>
+                      
+                      {activeMenuId === t.id && (
+                        <div className="action-menu glass-panel fade-in">
+                          <button onClick={() => handleEdit(t)} className="menu-item">
+                            <Edit2 size={14} /> Edit
+                          </button>
+                          <button onClick={() => setDeleteConfirmId(t.id)} className="menu-item delete">
+                            <Trash2 size={14} /> Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {filteredTransactions.length === 0 && (
+            <div className="empty-state">
+              <p>No transactions found matching your search.</p>
+            </div>
+          )}
+
+          <div className="pagination">
+            <span className="pagination-info">Showing {filteredTransactions.length} of {transactions.length} transactions</span>
+            <div className="pagination-btns">
+              <button className="page-btn disabled"><ChevronLeft size={18} /></button>
+              <button className="page-btn active">1</button>
+              <button className="page-btn"><ChevronRight size={18} /></button>
+            </div>
           </div>
         </div>
       </div>
@@ -124,7 +264,25 @@ const Transactions = () => {
       <AddTransactionModal 
         isOpen={isModalOpen} 
         onClose={() => setModalOpen(false)} 
+        editData={editData}
       />
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="modal-overlay">
+          <div className="modal-container glass-panel fade-in delete-confirm">
+            <div className="confirm-icon">
+              <AlertCircle size={40} />
+            </div>
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete this transaction? This action cannot be undone.</p>
+            <div className="confirm-actions">
+              <button className="secondary-btn" onClick={() => setDeleteConfirmId(null)}>Cancel</button>
+              <button className="primary-btn delete-btn" onClick={() => handleDelete(deleteConfirmId)}>Delete Entry</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -10,16 +10,7 @@ export const useTransactions = () => {
   return context;
 };
 
-const initialTransactions = [
-  { id: 1, name: 'Apple Store', category: 'Tech', amount: -1299.00, date: '2026-05-04', status: 'Completed', type: 'expense' },
-  { id: 2, name: 'Stripe Payout', category: 'Salary', amount: 4500.00, date: '2026-05-03', status: 'Completed', type: 'income' },
-  { id: 3, name: 'Starbucks', category: 'Food', amount: -12.50, date: '2026-05-03', status: 'Pending', type: 'expense' },
-  { id: 4, name: 'Netflix Subscription', category: 'Entertainment', amount: -15.99, date: '2026-05-02', status: 'Completed', type: 'expense' },
-  { id: 5, name: 'Uber Trip', category: 'Transport', amount: -24.50, date: '2026-05-02', status: 'Completed', type: 'expense' },
-  { id: 6, name: 'Freelance Work', category: 'Income', amount: 850.00, date: '2026-05-01', status: 'Completed', type: 'income' },
-  { id: 7, name: 'Gym Membership', category: 'Health', amount: -50.00, date: '2026-04-30', status: 'Completed', type: 'expense' },
-  { id: 8, name: 'Amazon Purchase', category: 'Shopping', amount: -89.99, date: '2026-04-29', status: 'Completed', type: 'expense' },
-];
+const initialTransactions = [];
 
 export const TransactionProvider = ({ children }) => {
   const [transactions, setTransactions] = useState(() => {
@@ -27,9 +18,43 @@ export const TransactionProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialTransactions;
   });
 
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user_profile');
+    return saved ? JSON.parse(saved) : { name: 'User', plan: 'Pro Member', currency: 'USD' };
+  });
+
+  const [goals, setGoals] = useState(() => {
+    const saved = localStorage.getItem('savings_goals');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: 'New Car', target: 25000, current: 18750, color: '#f59e0b' },
+      { id: 2, name: 'Home Downpayment', target: 50000, current: 15000, color: '#10b981' },
+      { id: 3, name: 'Vacation Fund', target: 5000, current: 4500, color: '#6366f1' }
+    ];
+  });
+
   useEffect(() => {
     localStorage.setItem('transactions', JSON.stringify(transactions));
   }, [transactions]);
+
+  useEffect(() => {
+    localStorage.setItem('user_profile', JSON.stringify(user));
+  }, [user]);
+
+  useEffect(() => {
+    localStorage.setItem('savings_goals', JSON.stringify(goals));
+  }, [goals]);
+
+  const addGoal = (goal) => {
+    setGoals([...goals, { ...goal, id: Date.now() }]);
+  };
+
+  const updateGoal = (id, updatedGoal) => {
+    setGoals(goals.map(g => g.id === id ? { ...g, ...updatedGoal } : g));
+  };
+
+  const deleteGoal = (id) => {
+    setGoals(goals.filter(g => g.id !== id));
+  };
 
   const addTransaction = (transaction) => {
     setTransactions([
@@ -47,6 +72,14 @@ export const TransactionProvider = ({ children }) => {
     setTransactions(transactions.filter(t => t.id !== id));
   };
 
+  const updateTransaction = (id, updatedData) => {
+    setTransactions(transactions.map(t => t.id === id ? { ...t, ...updatedData } : t));
+  };
+
+  const clearAllData = () => {
+    setTransactions([]);
+  };
+
   const totals = transactions.reduce((acc, curr) => {
     if (curr.type === 'income') {
       acc.income += curr.amount;
@@ -58,7 +91,20 @@ export const TransactionProvider = ({ children }) => {
   }, { income: 0, expense: 0, balance: 0 });
 
   return (
-    <TransactionContext.Provider value={{ transactions, addTransaction, deleteTransaction, totals }}>
+    <TransactionContext.Provider value={{ 
+      transactions, 
+      addTransaction, 
+      deleteTransaction, 
+      updateTransaction, 
+      clearAllData,
+      user,
+      setUser,
+      goals,
+      addGoal,
+      updateGoal,
+      deleteGoal,
+      totals 
+    }}>
       {children}
     </TransactionContext.Provider>
   );
