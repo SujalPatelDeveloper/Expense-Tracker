@@ -13,11 +13,13 @@ import {
 } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import EmptyState from '../components/EmptyState';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import './Savings.css';
 
 const Savings = () => {
-  const { goals, addGoal, updateGoal, deleteGoal, searchQuery, setSearchQuery } = useTransactions();
+  const { goals, addGoal, updateGoal, deleteGoal, searchQuery, setSearchQuery, currencySymbol, formatAmount } = useTransactions();
   const [isModalOpen, setModalOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [editGoal, setEditGoal] = useState(null);
   const [formData, setFormData] = useState({ name: '', target: '', current: '', color: '#f59e0b' });
 
@@ -50,6 +52,13 @@ const Savings = () => {
       addGoal(data);
     }
     setModalOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (deleteConfirmId) {
+      deleteGoal(deleteConfirmId);
+      setDeleteConfirmId(null);
+    }
   };
 
   const totalTarget = goals.reduce((acc, g) => acc + Number(g.target), 0);
@@ -85,11 +94,11 @@ const Savings = () => {
           <div className="summary-info">
             <div className="summary-item">
               <span className="label">Total Saved</span>
-              <span className="value">${totalSaved.toLocaleString()}</span>
+              <span className="value">{currencySymbol}{formatAmount(totalSaved)}</span>
             </div>
             <div className="summary-item">
               <span className="label">Total Target</span>
-              <span className="value">${totalTarget.toLocaleString()}</span>
+              <span className="value">{currencySymbol}{formatAmount(totalTarget)}</span>
             </div>
             <div className="summary-item">
               <span className="label">Overall Progress</span>
@@ -121,16 +130,16 @@ const Savings = () => {
                     </div>
                     <div className="goal-actions">
                       <button onClick={() => handleOpenModal(goal)}><Edit2 size={16} /></button>
-                      <button onClick={() => deleteGoal(goal.id)} className="delete"><Trash2 size={16} /></button>
+                      <button onClick={() => setDeleteConfirmId(goal.id)} className="delete"><Trash2 size={16} /></button>
                     </div>
                   </div>
                   
                   <div className="goal-card-body">
                     <h3>{goal.name}</h3>
                     <div className="goal-amounts">
-                      <span className="current">${Number(goal.current).toLocaleString()}</span>
+                      <span className="current">{currencySymbol}{formatAmount(goal.current)}</span>
                       <span className="separator">of</span>
-                      <span className="target">${Number(goal.target).toLocaleString()}</span>
+                      <span className="target">{currencySymbol}{formatAmount(goal.target)}</span>
                     </div>
                     
                     <div className="progress-container">
@@ -158,7 +167,7 @@ const Savings = () => {
                       </div>
                     )}
                     <span className="remaining">
-                      ${(goal.target - goal.current).toLocaleString()} remaining
+                      {currencySymbol}{formatAmount(goal.target - goal.current)} remaining
                     </span>
                   </div>
                 </div>
@@ -189,7 +198,7 @@ const Savings = () => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Target Amount ($)</label>
+                  <label>Target Amount ({currencySymbol})</label>
                   <input 
                     type="number" 
                     placeholder="0.00" 
@@ -199,7 +208,7 @@ const Savings = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Current Savings ($)</label>
+                  <label>Current Savings ({currencySymbol})</label>
                   <input 
                     type="number" 
                     placeholder="0.00" 
@@ -230,6 +239,14 @@ const Savings = () => {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal 
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleDelete}
+        title="Delete Savings Goal"
+        message="Are you sure you want to delete this savings goal? All progress data for this goal will be lost."
+      />
     </div>
   );
 };

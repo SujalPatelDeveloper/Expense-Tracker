@@ -14,23 +14,23 @@ import {
 import { useTransactions } from '../context/TransactionContext';
 import { useToast } from '../context/ToastContext';
 import EmptyState from '../components/EmptyState';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import './Subscriptions.css';
 
 const Subscriptions = () => {
-  const { subscriptions, addSubscription, deleteSubscription, editSubscription, searchQuery } = useTransactions();
+  const { subscriptions, addSubscription, deleteSubscription, editSubscription, searchQuery, currencySymbol, formatAmount } = useTransactions();
   const { addToast } = useToast();
   const [viewMode, setViewMode] = useState('grid');
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingSub, setEditingSub] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [subToDelete, setSubToDelete] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   
   const [formData, setFormData] = useState({ 
     name: '', 
     amount: '', 
     cycle: 'Monthly', 
     category: 'Entertainment',
-    nextBilling: new Date().toISOString().split('T')[0]
+    next_billing: new Date().toISOString().split('T')[0]
   });
 
   const filteredSubscriptions = subscriptions.filter(sub => 
@@ -48,7 +48,7 @@ const Subscriptions = () => {
 
   const getSubsForDay = (day) => {
     return filteredSubscriptions.filter(sub => {
-      const subDay = new Date(sub.nextBilling).getDate();
+      const subDay = new Date(sub.next_billing).getDate();
       return subDay === day;
     });
   };
@@ -57,8 +57,7 @@ const Subscriptions = () => {
     e.preventDefault();
     const subData = { 
       ...formData, 
-      amount: Number(formData.amount),
-      id: editingSub ? editingSub.id : Date.now() 
+      amount: Number(formData.amount)
     };
 
     if (editingSub) {
@@ -86,21 +85,16 @@ const Subscriptions = () => {
       amount: '', 
       cycle: 'Monthly', 
       category: 'Entertainment',
-      nextBilling: new Date().toISOString().split('T')[0]
+      next_billing: new Date().toISOString().split('T')[0]
     });
   };
 
-  const confirmDelete = (sub) => {
-    setSubToDelete(sub);
-    setShowDeleteConfirm(true);
-  };
-
   const handleDelete = () => {
-    if (subToDelete) {
-      deleteSubscription(subToDelete.id);
-      addToast(`${subToDelete.name} removed`, 'info');
-      setShowDeleteConfirm(false);
-      setSubToDelete(null);
+    if (deleteConfirmId) {
+      const sub = subscriptions.find(s => s.id === deleteConfirmId);
+      deleteSubscription(deleteConfirmId);
+      addToast(`${sub?.name || 'Subscription'} removed`, 'info');
+      setDeleteConfirmId(null);
     }
   };
 
@@ -130,14 +124,14 @@ const Subscriptions = () => {
             <div className="metric-icon"><CreditCard size={24} /></div>
             <div className="metric-data">
               <span className="label">Monthly Total</span>
-              <span className="value">${monthlyTotal.toFixed(2)}</span>
+              <span className="value">{currencySymbol}{formatAmount(monthlyTotal)}</span>
             </div>
           </div>
           <div className="metric-panel glass-panel">
             <div className="metric-icon"><Calendar size={24} /></div>
             <div className="metric-data">
               <span className="label">Annual Projection</span>
-              <span className="value">${(monthlyTotal * 12).toFixed(2)}</span>
+              <span className="value">{currencySymbol}{formatAmount(monthlyTotal * 12)}</span>
             </div>
           </div>
           <div className="metric-panel glass-panel">
@@ -167,23 +161,23 @@ const Subscriptions = () => {
                     <button onClick={() => handleEdit(sub)} className="edit-sub">
                       <Edit2 size={16} />
                     </button>
-                    <button onClick={() => confirmDelete(sub)} className="delete-sub">
-                      <Trash2 size={16} />
-                    </button>
+                    <button onClick={() => setDeleteConfirmId(sub.id)} className="delete-sub">
+                            <Trash2 size={16} />
+                          </button>
                   </div>
                 </div>
                 <div className="sub-card-body">
                   <h3>{sub.name}</h3>
                   <span className="sub-category"><Tag size={12} /> {sub.category}</span>
                   <div className="sub-price">
-                    <span className="price">${sub.amount.toFixed(2)}</span>
+                    <span className="price">{currencySymbol}{formatAmount(sub.amount)}</span>
                     <span className="cycle">/{sub.cycle === 'Monthly' ? 'mo' : 'yr'}</span>
                   </div>
                 </div>
                 <div className="sub-card-footer">
                   <div className="next-billing">
                     <AlertCircle size={14} />
-                    <span>Next Billing: {formatDate(sub.nextBilling)}</span>
+                    <span>Next Billing: {formatDate(sub.next_billing)}</span>
                   </div>
                 </div>
               </div>
@@ -199,7 +193,7 @@ const Subscriptions = () => {
                     <span className="day-number">{day}</span>
                     <div className="day-subs">
                       {daySubs.map(sub => (
-                        <div key={sub.id} className="day-sub-dot" title={`${sub.name} - $${sub.amount}`} style={{ background: sub.category === 'Work' ? '#3b82f6' : '#f59e0b' }}></div>
+                        <div key={sub.id} className="day-sub-dot" title={`${sub.name} - ${currencySymbol}${sub.amount}`} style={{ background: sub.category === 'Work' ? '#3b82f6' : '#f59e0b' }}></div>
                       ))}
                     </div>
                   </div>
@@ -229,7 +223,7 @@ const Subscriptions = () => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Amount ($)</label>
+                  <label>Amount ({currencySymbol})</label>
                   <input type="number" step="0.01" placeholder="0.00" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} required />
                 </div>
                 <div className="form-group">
@@ -253,7 +247,7 @@ const Subscriptions = () => {
                 </div>
                 <div className="form-group">
                   <label>Next Billing Date</label>
-                  <input type="date" value={formData.nextBilling} onChange={(e) => setFormData({...formData, nextBilling: e.target.value})} required />
+                  <input type="date" value={formData.next_billing} onChange={(e) => setFormData({...formData, next_billing: e.target.value})} required />
                 </div>
               </div>
               <button type="submit" className="primary-btn">
@@ -264,20 +258,13 @@ const Subscriptions = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="modal-overlay">
-          <div className="modal-container glass-panel delete-confirm-modal fade-in">
-            <div className="confirm-icon"><Trash2 size={40} /></div>
-            <h2>Remove Subscription?</h2>
-            <p>Are you sure you want to remove <strong>{subToDelete?.name}</strong>? This action cannot be undone.</p>
-            <div className="confirm-actions">
-              <button className="secondary-btn" onClick={() => setShowDeleteConfirm(false)}>Cancel</button>
-              <button className="primary-btn danger" onClick={handleDelete}>Delete Subscription</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmModal 
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleDelete}
+        title="Remove Subscription"
+        message={`Are you sure you want to remove this subscription? This action cannot be undone.`}
+      />
     </div>
   );
 };

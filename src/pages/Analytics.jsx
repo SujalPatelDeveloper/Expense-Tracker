@@ -32,7 +32,7 @@ import { useTransactions } from '../context/TransactionContext';
 import './Analytics.css';
 
 const Analytics = () => {
-  const { transactions, totals } = useTransactions();
+  const { transactions, totals, currencySymbol, formatAmount } = useTransactions();
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const filteredTransactions = useMemo(() => {
@@ -108,17 +108,17 @@ const Analytics = () => {
 
       {/* Summary Row */}
       <div className="analytics-summary-grid">
-        <div className="summary-card glass-panel">
+        <div className="summary-card glass-panel income-highlight">
           <div className="card-info">
             <span className="label">Savings Rate</span>
-            <span className="value">{totals.income > 0 ? ((totals.income - totals.expense) / totals.income * 100).toFixed(1) : 0}%</span>
+            <span className="value">{(totals.income > 0 ? ((totals.income - totals.expense) / totals.income * 100) : 0).toFixed(1)}%</span>
           </div>
           <div className="card-icon savings"><TrendingUp size={24} /></div>
         </div>
-        <div className="summary-card glass-panel">
+        <div className="summary-card glass-panel expense-highlight">
           <div className="card-info">
             <span className="label">Daily Average</span>
-            <span className="value">${(totals.expense / 30).toFixed(2)}</span>
+            <span className="value">{currencySymbol}{formatAmount(totals.expense / 30)}</span>
           </div>
           <div className="card-icon expense"><TrendingDown size={24} /></div>
         </div>
@@ -159,6 +159,7 @@ const Analytics = () => {
                 <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
+                  formatter={(value) => [`${currencySymbol}${formatAmount(value)}`, '']}
                 />
                 <Area type="monotone" dataKey="income" stroke="#10b981" fillOpacity={1} fill="url(#incomeGradient)" strokeWidth={3} />
                 <Area type="monotone" dataKey="expense" stroke="#f43f5e" fillOpacity={1} fill="url(#expenseGradient)" strokeWidth={3} />
@@ -193,7 +194,7 @@ const Analytics = () => {
                       />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value) => [`${currencySymbol}${formatAmount(value)}`, 'Amount']} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -208,7 +209,7 @@ const Analytics = () => {
                     <div className="cat-dot" style={{ backgroundColor: item.color }}></div>
                     <span>{item.name}</span>
                   </div>
-                  <span className="cat-val">${item.value.toFixed(0)}</span>
+                  <span className="cat-val">{currencySymbol}{formatAmount(item.value)}</span>
                 </div>
               ))}
             </div>
@@ -227,6 +228,7 @@ const Analytics = () => {
                   <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
+                    formatter={(value) => [`${currencySymbol}${formatAmount(value)}`, '']}
                   />
                   <Bar dataKey="expense" fill="#f59e0b" radius={[6, 6, 0, 0]} barSize={30} />
                 </BarChart>
@@ -252,7 +254,7 @@ const Analytics = () => {
                       <span className="date">{t.date}</span>
                     </div>
                   </div>
-                  <div className="drill-amount">-${Math.abs(t.amount).toFixed(2)}</div>
+                  <div className="drill-amount text-danger">-{currencySymbol}{formatAmount(Math.abs(t.amount))}</div>
                 </div>
               ))}
             </div>

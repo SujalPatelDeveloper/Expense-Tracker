@@ -16,17 +16,18 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
+import { useTransactions } from '../context/TransactionContext';
 import CountUp from '../components/CountUp';
+import LegalModal from '../components/LegalModal';
+import LandingNav from '../components/LandingNav';
 import './Home.css';
 
 const Landing = () => {
-  const [isDark, setIsDark] = React.useState(true);
+  const { isDark, toggleTheme } = useTransactions();
+  const [legalModal, setLegalModal] = React.useState({ isOpen: false, type: 'privacy' });
 
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme ? 'dark' : 'light');
-  };
+  const openLegal = (type) => setLegalModal({ isOpen: true, type });
+  const closeLegal = () => setLegalModal({ ...legalModal, isOpen: false });
 
   return (
     <div className="landing-wrapper">
@@ -35,21 +36,7 @@ const Landing = () => {
       <div className="bg-glow bottom-left"></div>
 
       {/* Navigation */}
-      <nav className="landing-nav glass-panel fade-in">
-        <div className="nav-logo">
-          <TrendingUp color="var(--accent-primary)" size={28} />
-          <span>FinVista</span>
-        </div>
-        <div className="nav-links">
-          <Link to="/about">Features</Link>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/login" className="nav-signin">Sign In</Link>
-          <button className="theme-toggle-landing" onClick={toggleTheme}>
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <Link to="/dashboard" className="nav-cta">Launch App</Link>
-        </div>
-      </nav>
+      <LandingNav />
 
       {/* Hero Section */}
       <section className="hero-landing fade-in">
@@ -65,7 +52,7 @@ const Landing = () => {
             glassmorphic design with AI-driven insights to transform your data into growth.
           </p>
           <div className="hero-cta">
-            <Link to="/dashboard" className="primary-btn">
+            <Link to="/login" className="primary-btn">
               Get Started for Free <ArrowRight size={20} />
             </Link>
             <div className="user-stats">
@@ -159,7 +146,7 @@ const Landing = () => {
           <h2>Ready to revolutionize your <br />financial life?</h2>
           <p>Join the future of wealth intelligence today. No credit card required.</p>
           <div className="cta-btns">
-            <Link to="/dashboard" className="primary-btn large">Start Free Trial</Link>
+            <Link to="/login" className="primary-btn large">Start Free Trial</Link>
             <Link to="/about" className="secondary-btn large">View Pricing</Link>
           </div>
         </div>
@@ -190,9 +177,9 @@ const Landing = () => {
             </div>
             <div className="f-col">
               <h4>Legal</h4>
-              <Link to="/privacy">Privacy</Link>
-              <Link to="/terms">Terms</Link>
-              <Link to="/security">Security</Link>
+              <button onClick={() => openLegal('privacy')} className="footer-link-btn">Privacy</button>
+              <button onClick={() => openLegal('terms')} className="footer-link-btn">Terms</button>
+              <button onClick={() => openLegal('security')} className="footer-link-btn">Security</button>
             </div>
           </div>
         </div>
@@ -200,6 +187,11 @@ const Landing = () => {
           <p>© 2026 FinVista Intelligence. Designed with precision.</p>
         </div>
       </footer>
+      <LegalModal 
+        isOpen={legalModal.isOpen} 
+        onClose={closeLegal} 
+        type={legalModal.type} 
+      />
     </div>
   );
 };

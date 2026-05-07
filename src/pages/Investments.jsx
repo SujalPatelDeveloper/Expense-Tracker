@@ -14,12 +14,14 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useTransactions } from '../context/TransactionContext';
 import { useToast } from '../context/ToastContext';
 import EmptyState from '../components/EmptyState';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import './Investments.css';
 
 const Investments = () => {
-  const { investments, addInvestment, deleteInvestment, searchQuery, setSearchQuery } = useTransactions();
+  const { investments, addInvestment, deleteInvestment, searchQuery, setSearchQuery, currencySymbol, formatAmount } = useTransactions();
   const { addToast } = useToast();
   const [isModalOpen, setModalOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [formData, setFormData] = useState({ name: '', symbol: '', amount: '', type: 'Stock', growth: 0 });
 
   const filteredInvestments = investments.filter(inv => 
@@ -44,9 +46,12 @@ const Investments = () => {
     setFormData({ name: '', symbol: '', amount: '', type: 'Stock', growth: 0 });
   };
 
-  const handleDelete = (id, name) => {
-    deleteInvestment(id);
-    addToast(`${name} removed from portfolio`, 'info');
+  const handleDelete = () => {
+    if (!deleteConfirmId) return;
+    const inv = investments.find(i => i.id === deleteConfirmId);
+    deleteInvestment(deleteConfirmId);
+    addToast(`${inv?.name || 'Asset'} removed from portfolio`, 'info');
+    setDeleteConfirmId(null);
   };
 
   return (
@@ -78,7 +83,7 @@ const Investments = () => {
           <div className="summary-card glass-panel">
             <div className="card-info">
               <span className="label">Total Portfolio Value</span>
-              <span className="value">${totalValue.toLocaleString()}</span>
+              <span className="value">{currencySymbol}{formatAmount(totalValue)}</span>
             </div>
             <div className="card-icon portfolio"><Briefcase size={24} /></div>
           </div>
@@ -130,15 +135,15 @@ const Investments = () => {
                           </div>
                         </td>
                         <td><span className={`asset-type-tag ${inv.type.toLowerCase()}`}>{inv.type}</span></td>
-                        <td><span className="asset-value">${Number(inv.amount).toLocaleString()}</span></td>
+                        <td><span className="asset-value">{currencySymbol}{formatAmount(inv.amount)}</span></td>
                         <td>
-                          <span className={`asset-growth ${Number(inv.growth) >= 0 ? 'up' : 'down'}`}>
+                          <span className={`asset-growth ${Number(inv.growth) >= 0 ? 'text-success' : 'text-danger'}`}>
                             {Number(inv.growth) >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                             {Math.abs(inv.growth)}%
                           </span>
                         </td>
                         <td>
-                          <button onClick={() => handleDelete(inv.id, inv.name)} className="delete-btn">
+                          <button onClick={() => setDeleteConfirmId(inv.id)} className="delete-btn">
                             <Trash2 size={16} />
                           </button>
                         </td>
@@ -165,7 +170,7 @@ const Investments = () => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value) => [`${currencySymbol}${formatAmount(value)}`, 'Value']} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -212,7 +217,7 @@ const Investments = () => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Invested Amount ($)</label>
+                  <label>Invested Amount ({currencySymbol})</label>
                   <input type="number" placeholder="0.00" value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} required />
                 </div>
                 <div className="form-group">
@@ -225,6 +230,14 @@ const Investments = () => {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal 
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleDelete}
+        title="Remove Asset"
+        message="Are you sure you want to remove this asset from your portfolio?"
+      />
     </div>
   );
 };

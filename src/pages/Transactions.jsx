@@ -12,17 +12,19 @@ import {
   Edit2,
   Trash2,
   AlertCircle,
-  DollarSign
+  DollarSign,
+  Paperclip
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useTransactions } from '../context/TransactionContext';
 import AddTransactionModal from '../components/AddTransactionModal';
 import EmptyState from '../components/EmptyState';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import './Transactions.css';
 
 const Transactions = () => {
-  const { transactions, deleteTransaction, searchQuery, setSearchQuery } = useTransactions();
+  const { transactions, deleteTransaction, searchQuery, setSearchQuery, currencySymbol, formatAmount } = useTransactions();
   const [isModalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -116,16 +118,46 @@ const Transactions = () => {
       t.category,
       t.date,
       t.type.toUpperCase(),
-      `${t.type === 'income' ? '+' : '-'}$${Math.abs(t.amount).toFixed(2)}`,
+      `${t.type === 'income' ? '+' : '-'}${currencySymbol}${formatAmount(Math.abs(t.amount))}`,
       t.status || 'Completed'
     ]);
+
+    const netTotal = transactions.reduce((acc, t) => {
+      return t.type === 'income' ? acc + Number(t.amount) : acc - Math.abs(Number(t.amount));
+    }, 0);
 
     autoTable(doc, {
       head: [['Transaction', 'Category', 'Date', 'Type', 'Amount', 'Status']],
       body: tableData,
+      foot: [['', '', '', 'NET TOTAL', `${netTotal >= 0 ? '+' : '-'}${currencySymbol}${formatAmount(Math.abs(netTotal))}`, '']],
       startY: 40,
       theme: 'striped',
-      headStyles: { fillColor: [245, 158, 11] }, // Amber primary color
+      styles: { font: 'helvetica', fontSize: 10 },
+      headStyles: { 
+        fillColor: [245, 158, 11],
+        fontStyle: 'bold'
+      },
+      footStyles: {
+        fillColor: [241, 245, 249],
+        textColor: [40, 40, 40],
+        fontStyle: 'bold'
+      },
+      columnStyles: {
+        4: { halign: 'right', fontStyle: 'bold' } 
+      },
+      willDrawCell: (data) => {
+        // Color code Amount column body cells
+        if (data.column.index === 4 && data.cell.section === 'body') {
+          const type = data.row.raw[3];
+          if (type === 'INCOME') data.doc.setTextColor(16, 185, 129);
+          else if (type === 'EXPENSE') data.doc.setTextColor(244, 63, 94);
+        }
+        // Color code NET TOTAL in footer
+        if (data.column.index === 4 && data.cell.section === 'footer') {
+          if (netTotal >= 0) data.doc.setTextColor(16, 185, 129); // Profit
+          else data.doc.setTextColor(244, 63, 94); // Loss
+        }
+      },
       alternateRowStyles: { fillColor: [248, 250, 252] }
     });
 
@@ -214,7 +246,18 @@ const Transactions = () => {
                           <div className={`type-icon ${t.type}`}>
                             {t.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                           </div>
-                          <span className="transaction-name">{t.name}</span>
+                          <span className="transaction-name">
+                            {t.name}
+                            {t.receipt_urls && t.receipt_urls.length > 0 && (
+                              <div style={{ display: 'inline-flex', gap: '4px', marginLeft: '8px' }}>
+                                {t.receipt_urls.map((url, i) => (
+                                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="receipt-link" style={{ color: 'var(--text-secondary)' }} title={`View Receipt ${i+1}`}>
+                                    <Paperclip size={14} />
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </span>
                         </div>
                       </td>
                       <td><span className="category-tag">{t.category}</span></td>
@@ -226,7 +269,7 @@ const Transactions = () => {
                       </td>
                       <td>
                         <span className={`amount-text ${t.type}`}>
-                          {t.type === 'income' ? '+' : '-'}${Math.abs(t.amount).toFixed(2)}
+                          {t.type === 'income' ? '+' : '-'}{currencySymbol}{formatAmount(Math.abs(t.amount))}
                         </span>
                       </td>
                       <td className="actions-cell">
@@ -274,22 +317,13 @@ const Transactions = () => {
         editData={editData}
       />
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmId && (
-        <div className="modal-overlay">
-          <div className="modal-container glass-panel fade-in delete-confirm">
-            <div className="confirm-icon">
-              <AlertCircle size={40} />
-            </div>
-            <h2>Confirm Deletion</h2>
-            <p>Are you sure you want to delete this transaction? This action cannot be undone.</p>
-            <div className="confirm-actions">
-              <button className="secondary-btn" onClick={() => setDeleteConfirmId(null)}>Cancel</button>
-              <button className="primary-btn delete-btn" onClick={() => handleDelete(deleteConfirmId)}>Delete Entry</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmModal 
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={() => handleDelete(deleteConfirmId)}
+        title="Delete Transaction"
+        message="Are you sure you want to delete this transaction? This action cannot be undone."
+      />
     </div>
   );
 };

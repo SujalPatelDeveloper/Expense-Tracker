@@ -37,8 +37,7 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { transactions, totals, goals, user, searchQuery, setSearchQuery } = useTransactions();
-  const [isDark, setIsDark] = useState(true);
+  const { transactions, totals, goals, user, searchQuery, setSearchQuery, isDark, toggleTheme, currencySymbol, formatAmount } = useTransactions();
   const [isModalOpen, setModalOpen] = useState(false);
 
   const categoryData = useMemo(() => {
@@ -75,12 +74,6 @@ const Dashboard = () => {
     });
     return data;
   }, [transactions]);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme ? 'dark' : 'light');
-  };
 
   return (
     <div className="dashboard-wrapper">
@@ -149,7 +142,7 @@ const Dashboard = () => {
             <div className="net-worth-info">
               <span className="label">Total Net Worth</span>
               <div className="value-group">
-                <span className="currency">$</span>
+                <span className="currency">{currencySymbol}</span>
                 <span className="value">
                   <CountUp end={totals.netWorth} decimals={2} />
                 </span>
@@ -189,7 +182,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="metric-value">
-              <CountUp end={totals.balance} prefix="$" decimals={2} />
+              <CountUp end={totals.balance} prefix={currencySymbol} decimals={2} />
             </div>
             <div className="sparkline-placeholder"></div>
             <p className="metric-subtext">Current Wallet Balance</p>
@@ -204,13 +197,13 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="metric-value">
-              <CountUp end={totals.income} prefix="$" decimals={2} />
+              <CountUp end={totals.income} prefix={currencySymbol} decimals={2} />
             </div>
             <div className="sparkline-placeholder"></div>
             <p className="metric-subtext">Total deposits this month</p>
           </div>
 
-          <div className="metric-card glass-panel">
+          <div className="metric-card glass-panel expense-highlight">
             <div className="metric-header">
               <span className="metric-title">Total Expenses</span>
               <div className="metric-trend down">
@@ -219,7 +212,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="metric-value">
-              <CountUp end={totals.expense} prefix="$" decimals={2} />
+              <CountUp end={totals.expense} prefix={currencySymbol} decimals={2} />
             </div>
             <div className="sparkline-placeholder"></div>
             <p className="metric-subtext">Total spending this month</p>
@@ -320,7 +313,7 @@ const Dashboard = () => {
                 </div>
                 <div className="radial-center-text">
                   <span className="label">Total Spent</span>
-                  <span className="value">${totals.expense.toFixed(0)}</span>
+                  <span className="value text-danger">{currencySymbol}{formatAmount(totals.expense)}</span>
                 </div>
               </div>
               <div className="category-legend">

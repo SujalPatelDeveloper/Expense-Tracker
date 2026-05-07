@@ -9,6 +9,28 @@
   padding: 2rem;
 }
 
+.back-home-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  z-index: 10;
+  transition: var(--transition-smooth);
+}
+
+.back-home-btn:hover {
+  transform: translateX(-5px);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 .login-glow {
   position: absolute;
   width: 500px;
@@ -144,32 +166,20 @@
 
 .login-divider {
   margin: 2rem 0;
-  position: relative;
-  text-align: center;
-}
-
-.login-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--glass-border);
-  z-index: 0;
-}
-
-.login-divider span {
-  position: relative;
-  background: var(--bg-primary);
-  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   color: var(--text-muted);
   font-size: 0.85rem;
-  z-index: 1;
+  white-space: nowrap;
 }
 
-[data-theme='light'] .login-divider span {
-  background: var(--bg-secondary);
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--glass-border);
 }
 
 .social-login {

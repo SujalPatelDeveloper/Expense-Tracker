@@ -137,7 +137,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.settings-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .settings-form .form-group label {
@@ -165,19 +176,33 @@
 /* Danger Zone */
 .danger-zone {
   border: 1px solid rgba(244, 63, 94, 0.2);
-  background: rgba(244, 63, 94, 0.05);
-  border-radius: 16px;
-  padding: 2rem;
+  background: rgba(244, 63, 94, 0.03);
+  border-radius: 20px;
+  padding: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: var(--transition-smooth);
+}
+
+.danger-zone:hover {
+  border-color: var(--accent-danger);
+  background: rgba(244, 63, 94, 0.06);
 }
 
 .danger-info {
   display: flex;
   gap: 1.5rem;
   align-items: center;
-  max-width: 60%;
+  max-width: 70%;
+}
+
+.danger-zone .delete-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 12px 24px;
+  width: max-content;
+  min-width: fit-content;
 }
 
 .warning-icon {
@@ -219,6 +244,93 @@
 .pref-info p {
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+.theme-toggle-minimal {
+  display: flex;
+  background: var(--bg-secondary);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.theme-toggle-minimal button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: var(--transition-smooth);
+}
+
+.theme-toggle-minimal button.active {
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: 0 4px 12px var(--accent-primary-glow);
+}
+
+.theme-toggle-minimal button:not(.active):hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Security Specific Adjustments */
+.tab-pane .settings-form {
+  max-width: 800px;
+}
+
+.security-info-card {
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition-smooth);
+}
+
+.security-info-card:hover {
+  border-color: var(--accent-primary);
+  background: rgba(245, 158, 11, 0.02);
+}
+
+.security-info-card .info-text h4 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.security-info-card .info-text p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.setup-btn-premium {
+  padding: 10px 20px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  color: var(--accent-primary);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.setup-btn-premium:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: white;
+  box-shadow: 0 4px 12px var(--accent-primary-glow);
+}
+
+.setup-btn-premium:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Switch UI */
@@ -304,10 +416,12 @@ input:checked + .slider:before {
   .settings-tabs {
     flex-direction: row;
     overflow-x: auto;
-    padding: 0.75rem;
-    gap: 8px;
+    padding: 0.5rem;
+    gap: 6px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    border-radius: 16px;
+    margin-bottom: 0.5rem;
   }
   
   .settings-tabs::-webkit-scrollbar {
@@ -370,8 +484,45 @@ input:checked + .slider:before {
   }
 
   .pref-item {
+    flex-direction: column;
+    align-items: stretch;
     padding: 1.25rem;
-    gap: 15px;
+    gap: 1.25rem;
+  }
+
+  .pref-info {
+    text-align: center;
+  }
+
+  .pref-item .switch, 
+  .pref-item .theme-toggle-minimal {
+    align-self: center;
+  }
+
+  .settings-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .theme-toggle-minimal {
+    width: 100%;
+  }
+
+  .theme-toggle-minimal button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .security-info-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .setup-btn-premium {
+    width: 100%;
+    justify-content: center;
   }
 
   .confirm-actions {

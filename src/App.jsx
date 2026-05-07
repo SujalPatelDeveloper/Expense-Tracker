@@ -11,7 +11,12 @@ import Settings from './pages/Settings';
 import Savings from './pages/Savings';
 import Investments from './pages/Investments';
 import Subscriptions from './pages/Subscriptions';
+import Budgets from './pages/Budgets';
 import Login from './pages/Login';
+import Blog from './pages/Blog';
+import Careers from './pages/Careers';
+import ProtectedRoute from './components/ProtectedRoute';
+import FinanceAlerter from './components/FinanceAlerter';
 import { TransactionProvider } from './context/TransactionContext';
 import { ToastProvider } from './context/ToastContext';
 import './index.css';
@@ -20,7 +25,7 @@ import './App.css';
 const Layout = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const isAuthPage = location.pathname === '/' || location.pathname === '/login';
+  const isAuthPage = ['/', '/login', '/about', '/blog', '/careers'].includes(location.pathname);
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
@@ -28,6 +33,7 @@ const Layout = ({ children }) => {
     <div className={`app-container ${isAuthPage ? 'landing-mode' : ''}`}>
       {!isAuthPage && (
         <>
+          <FinanceAlerter />
           <button className="mobile-menu-btn" onClick={toggleSidebar}>
             {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -56,14 +62,20 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/analytics" element={<Analytics />} />
               <Route path="/about" element={<About />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/savings" element={<Savings />} />
-              <Route path="/investments" element={<Investments />} />
-              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/careers" element={<Careers />} />
+              
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/savings" element={<Savings />} />
+                <Route path="/budgets" element={<Budgets />} />
+                <Route path="/investments" element={<Investments />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
+              </Route>
             </Routes>
           </Layout>
         </Router>

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Shield, Zap, Globe, Cpu, Heart, Code } from 'lucide-react';
+import { Shield, Zap, Globe, Cpu, Heart, Code, Layers, Target } from 'lucide-react';
+import LandingNav from '../components/LandingNav';
+import './Home.css';
 import './About.css';
 
 const About = () => {
@@ -23,20 +25,39 @@ const About = () => {
       icon: <Cpu size={24} />, 
       title: "AI Insights", 
       desc: "Smart categorization and spending predictions powered by advanced machine learning." 
+    },
+    { 
+      icon: <Layers size={24} />, 
+      title: "Unified Portfolio", 
+      desc: "Manage Stocks, Crypto, ETFs, and Cash in one integrated, beautiful view." 
+    },
+    { 
+      icon: <Target size={24} />, 
+      title: "Wealth Goals", 
+      desc: "Set ambitious targets and track your journey to financial freedom with milestones." 
     }
   ];
 
   return (
-    <div className="about-container fade-in">
-      <section className="hero-section">
-        <div className="hero-badge">About FinVista</div>
-        <h1>Intelligence for Your <span className="gradient-text">Wealth Journey</span></h1>
-        <p className="hero-desc">
-          FinVista is the ultimate wealth intelligence platform. It combines 
-          advanced data analytics with personalized AI insights to help you 
-          master your finances and grow your assets like a pro.
-        </p>
-      </section>
+    <div className="landing-wrapper">
+      <div className="bg-glow top-right"></div>
+      <div className="bg-glow bottom-left"></div>
+      <LandingNav />
+      <div className="about-container fade-in">
+      <main className="hero-landing fade-in" style={{ gridTemplateColumns: '1fr', paddingTop: '8rem', minHeight: 'auto' }}>
+        <div className="hero-content" style={{ maxWidth: '900px' }}>
+          <div className="hero-announcement glass-panel" style={{ marginBottom: '1.5rem' }}>
+            <span className="badge">New</span>
+            <span>Version 2.0 is now live</span>
+          </div>
+          <h1>Intelligence for Your <span className="gradient-text">Wealth Journey</span></h1>
+          <p className="hero-subtitle">
+            FinVista is the ultimate wealth intelligence platform. It combines 
+            advanced data analytics with personalized AI insights to help you 
+            master your finances and grow your assets like a pro.
+          </p>
+        </div>
+      </main>
 
       <section className="features-grid">
         {features.map((f, i) => (
@@ -78,6 +99,7 @@ const About = () => {
         <div className="footer-item"><Code size={16} /> <span>Built with React & Vite</span></div>
         <div className="footer-item"><Heart size={16} color="#f43f5e" /> <span>Designed for Clarity</span></div>
       </footer>
+    </div>
     </div>
   );
 };

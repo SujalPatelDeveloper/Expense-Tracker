@@ -143,9 +143,9 @@
 .status-pill.completed { background: rgba(16, 185, 129, 0.1); color: var(--accent-secondary); }
 .status-pill.pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 
-.amount-text { font-weight: 700; font-size: 1rem; }
+.amount-text { font-weight: 700; font-size: 1rem; text-align: right; }
 .amount-text.income { color: var(--accent-secondary); }
-.amount-text.expense { color: var(--text-primary); }
+.amount-text.expense { color: var(--accent-danger); }
 
 .more-btn { color: var(--text-muted); transition: var(--transition-smooth); }
 .more-btn:hover { color: var(--text-primary); }
@@ -199,11 +199,6 @@
   position: relative;
 }
 
-.export-menu {
-  width: 180px;
-  top: 110%;
-}
-
 .action-menu {
   position: absolute;
   right: 0;
@@ -216,6 +211,17 @@
   z-index: 100;
   box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   margin-top: 5px;
+}
+
+.export-menu {
+  width: max-content;
+  min-width: 200px;
+  top: 110%;
+  right: 0;
+}
+
+.action-menu .menu-item {
+  white-space: nowrap;
 }
 
 .menu-item {

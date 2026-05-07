@@ -54,3 +54,80 @@
 .input-wrapper input {
   padding-left: 40px !important;
 }
+
+.hidden-file-input {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.file-upload-wrapper {
+  cursor: pointer;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: var(--bg-tertiary);
+  transition: var(--transition-smooth);
+  min-height: 46px; /* To match regular inputs */
+  border-radius: 8px; /* Assuming this is the global radius */
+}
+
+.file-upload-wrapper:hover {
+  border-color: var(--accent-primary);
+  background: rgba(245, 158, 11, 0.05); /* Match amber tint */
+}
+
+.file-upload-wrapper .file-upload-text {
+  padding-left: 40px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  width: calc(100% - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selected-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.selected-file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-tertiary);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.selected-file-item .file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+}
+
+.remove-file-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition-smooth);
+}
+
+.remove-file-btn:hover {
+  color: var(--accent-danger);
+  background: rgba(244, 63, 94, 0.1);
+}

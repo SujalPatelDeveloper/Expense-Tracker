@@ -270,6 +270,11 @@
 .sparkline-placeholder { height: 40px; background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.1), transparent); border-radius: 8px; }
 .metric-subtext { margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
 
+.metric-card.expense-highlight .metric-value,
+.text-danger {
+  color: var(--accent-danger) !important;
+}
+
 /* Main Grid Layout */
 .main-dashboard-grid {
   display: grid;
@@ -415,7 +420,7 @@
   text-align: center;
 }
 .radial-center-text .label { display: block; font-size: 0.8rem; color: var(--text-muted); }
-.radial-center-text .value { display: block; font-size: 1.5rem; font-weight: 800; }
+.radial-center-text .value { display: block; font-size: 0.9rem; font-weight: 800; }
 
 .category-legend { display: flex; flex-direction: column; gap: 10px; }
 .legend-item { display: flex; align-items: center; gap: 12px; font-size: 0.9rem; }

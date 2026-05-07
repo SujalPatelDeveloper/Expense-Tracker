@@ -17,10 +17,16 @@
   --border-color: rgba(255, 255, 255, 0.06);
   --glass-bg: rgba(22, 22, 26, 0.6);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --overlay-bg: transparent;
   
   --font-family: 'Outfit', sans-serif;
   --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.income-highlight .value { color: var(--accent-secondary) !important; }
+.expense-highlight .value { color: var(--accent-danger) !important; }
+.text-danger { color: var(--accent-danger) !important; }
+.text-success { color: var(--accent-secondary) !important; }
 
 [data-theme='light'] {
   --bg-primary: #f8fafc;
@@ -34,6 +40,7 @@
   --border-color: rgba(0, 0, 0, 0.06);
   --glass-bg: rgba(255, 255, 255, 0.8);
   --glass-border: rgba(0, 0, 0, 0.05);
+  --overlay-bg: rgba(255, 255, 255, 0.2);
   
   --accent-primary-glow: rgba(245, 158, 11, 0.15);
 }
@@ -101,9 +108,12 @@ button {
 /* Global Modal Styles */
 .modal-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--overlay-bg);
+  backdrop-filter: blur(10px);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -111,6 +121,7 @@ button {
   padding: 20px;
 }
 
+/* Global Modal Styles are now truly global using 100vw/100vh */
 .modal-container {
   width: 100%;
   max-width: 480px;
@@ -141,6 +152,20 @@ button {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.confirm-actions button {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 0;
+  white-space: nowrap;
 }
 
 .form-group {

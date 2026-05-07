@@ -10,23 +10,55 @@ import {
   Moon,
   Sun,
   AlertTriangle,
-  ChevronRight
+  ChevronRight,
+  Key
 } from 'lucide-react';
 import { useTransactions } from '../context/TransactionContext';
 import { useToast } from '../context/ToastContext';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import './Settings.css';
 
 const Settings = () => {
-  const { user, setUser, clearAllData } = useTransactions();
+  const { user, updateUserProfile, updateUserPassword, clearAllData, deleteAccount, isDark, toggleTheme, uploadAvatar } = useTransactions();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({ ...user });
   const [showConfirmReset, setShowConfirmReset] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  
+  const hasPassword = user?.providers?.includes('email');
+  
+  const [passwordForm, setPasswordForm] = useState({
+    old: '',
+    new: '',
+    confirm: ''
+  });
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    setUser(formData);
+    await updateUserProfile(formData);
     addToast('Profile updated successfully!', 'success');
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (passwordForm.new !== passwordForm.confirm) {
+      addToast('New passwords do not match', 'error');
+      return;
+    }
+    
+    // Pass old password only if they already have a password set
+    const { error, success } = await updateUserPassword(
+      hasPassword ? passwordForm.old : null, 
+      passwordForm.new
+    );
+
+    if (error) {
+      addToast(error, 'error');
+    } else if (success) {
+      addToast(hasPassword ? 'Password updated successfully' : 'Password assigned successfully', 'success');
+      setPasswordForm({ old: '', new: '', confirm: '' });
+    }
   };
 
   const handleResetData = () => {
@@ -35,20 +67,26 @@ const Settings = () => {
     addToast('All data has been cleared.', 'info');
   };
 
-  const handleAvatarChange = (e) => {
+
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, avatar: reader.result });
-      };
-      reader.readAsDataURL(file);
+      addToast('Uploading avatar...', 'info');
+      const avatarUrl = await uploadAvatar(file);
+      if (avatarUrl) {
+        setFormData({ ...formData, avatar: avatarUrl });
+        await updateUserProfile({ ...formData, avatar: avatarUrl });
+        addToast('Avatar updated successfully', 'success');
+      } else {
+        addToast('Failed to upload avatar. Is the avatars bucket created?', 'error');
+      }
     }
   };
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <User size={18} /> },
     { id: 'preferences', label: 'Preferences', icon: <Globe size={18} /> },
+    { id: 'security', label: 'Security', icon: <Key size={18} /> },
     { id: 'billing', label: 'Billing', icon: <CreditCard size={18} /> },
     { id: 'data', label: 'Data Management', icon: <Trash2 size={18} /> },
   ];
@@ -132,6 +170,7 @@ const Settings = () => {
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
                         <option value="GBP">GBP (£)</option>
+                        <option value="INR">INR (₹)</option>
                       </select>
                     </div>
                   </div>
@@ -159,15 +198,79 @@ const Settings = () => {
                   </div>
                   <div className="pref-item">
                     <div className="pref-info">
-                      <h4>Dark Mode</h4>
+                      <h4>Display Mode</h4>
                       <p>Switch between light and dark theme</p>
                     </div>
                     <div className="theme-toggle-minimal">
-                      <button className="active"><Moon size={14} /></button>
-                      <button><Sun size={14} /></button>
+                      <button 
+                        className={!isDark ? 'active' : ''} 
+                        onClick={() => !isDark || toggleTheme()}
+                      >
+                        <Sun size={14} />
+                        <span>Light</span>
+                      </button>
+                      <button 
+                        className={isDark ? 'active' : ''} 
+                        onClick={() => isDark || toggleTheme()}
+                      >
+                        <Moon size={14} />
+                        <span>Dark</span>
+                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'security' && (
+              <div className="tab-pane">
+                <h3>{hasPassword ? 'Change Password' : 'Set Password'}</h3>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+                  {hasPassword 
+                    ? "Update your password to keep your account secure." 
+                    : "You currently sign in with a social account. Set a password to allow email sign-in."}
+                </p>
+                <form onSubmit={handleUpdatePassword} className="settings-form">
+                  {hasPassword && (
+                    <div className="form-group">
+                      <label>Old Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        value={passwordForm.old}
+                        onChange={(e) => setPasswordForm({...passwordForm, old: e.target.value})}
+                        required
+                      />
+                    </div>
+                  )}
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>New Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        value={passwordForm.new}
+                        onChange={(e) => setPasswordForm({...passwordForm, new: e.target.value})}
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Confirm New Password</label>
+                      <input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        value={passwordForm.confirm}
+                        onChange={(e) => setPasswordForm({...passwordForm, confirm: e.target.value})}
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                  </div>
+                  <button type="submit" className="primary-btn">
+                    <Save size={18} /> {hasPassword ? 'Update Password' : 'Set Password'}
+                  </button>
+                </form>
               </div>
             )}
 
@@ -189,36 +292,51 @@ const Settings = () => {
                     Clear All Data
                   </button>
                 </div>
+
+                <div className="danger-zone" style={{ marginTop: '1.5rem', border: '1px solid rgba(244, 63, 94, 0.4)' }}>
+                  <div className="danger-info">
+                    <Trash2 size={24} className="warning-icon" />
+                    <div>
+                      <h4>Delete Account</h4>
+                      <p>Permanently remove your account and all associated data. This action is irreversible.</p>
+                    </div>
+                  </div>
+                  <button 
+                    className="primary-btn delete-btn" 
+                    onClick={() => setShowConfirmDelete(true)}
+                  >
+                    Delete Account
+                  </button>
+                </div>
               </div>
             )}
 
-            {(activeTab === 'billing' || !['profile', 'preferences', 'data'].includes(activeTab)) && (
+            {(activeTab === 'billing') && (
               <div className="tab-pane empty">
                 <Shield size={48} />
                 <h3>Secure Module</h3>
-                <p>Billing and Security modules are available in the Enterprise plan.</p>
+                <p>Billing modules are available in the Enterprise plan.</p>
               </div>
             )}
           </main>
         </div>
       </div>
 
-      {/* Reset Confirmation Modal */}
-      {showConfirmReset && (
-        <div className="modal-overlay">
-          <div className="modal-container glass-panel fade-in delete-confirm">
-            <div className="confirm-icon">
-              <AlertTriangle size={40} />
-            </div>
-            <h2>Absolute Reset?</h2>
-            <p>You are about to wipe your entire financial history. Are you absolutely sure?</p>
-            <div className="confirm-actions">
-              <button className="secondary-btn" onClick={() => setShowConfirmReset(false)}>No, Keep Data</button>
-              <button className="primary-btn delete-btn" onClick={handleResetData}>Yes, Wipe Everything</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmModal 
+        isOpen={showConfirmReset}
+        onClose={() => setShowConfirmReset(false)}
+        onConfirm={handleResetData}
+        title="Absolute Reset?"
+        message="You are about to wipe your entire financial history. Are you absolutely sure? This cannot be undone."
+      />
+
+      <DeleteConfirmModal 
+        isOpen={showConfirmDelete}
+        onClose={() => setShowConfirmDelete(false)}
+        onConfirm={deleteAccount}
+        title="Delete Account?"
+        message="This will wipe your profile and all your financial history. You will be logged out and cannot recover this data."
+      />
     </div>
   );
 };

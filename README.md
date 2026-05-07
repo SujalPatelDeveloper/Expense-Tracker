@@ -7,37 +7,49 @@ FinVista is a premium, high-performance financial management application designe
 ## ✨ Features
 
 - **📊 Smart Analytics**: Deep-dive into your spending habits with interactive charts powered by Recharts.
-- **🔐 Premium Auth Suite**: Secure, glassmorphic Login and Sign Up flows with social authentication options.
+- **🇮🇳 Multi-Locale Support**: Intelligent number formatting (Commas based on Indian or International systems) based on your currency.
+- **📄 Professional Reports**: Export your transactions to beautiful, color-coded PDFs with automatic Profit/Loss totals.
+- **🔐 Premium Auth Suite**: Secure, glassmorphic Login and Sign Up flows powered by Supabase.
 - **🎯 Savings Goals**: Define, track, and visualize your progress towards major financial milestones.
 - **📅 Subscription Manager**: Keep track of recurring payments with automated monthly/annual projections.
-- **🤖 AI Wealth Insights**: Automated recommendations to help you save more and spend smarter.
-- **📱 Responsive & Fluid**: A mobile-first design philosophy with glassmorphism and smooth micro-animations.
+- **📱 PWA Ready**: Install FinVista on your phone or desktop for a native app experience.
 - **🌓 Theme Support**: Elegant dark mode by default with light mode compatibility.
 
 ## 🚀 Tech Stack
 
 - **Frontend**: React 19 + Vite
+- **Database/Auth**: Supabase
 - **Styling**: Vanilla CSS (CSS Variables, Flexbox/Grid, Glassmorphism)
 - **Icons**: Lucide React
 - **Charts**: Recharts
-- **Routing**: React Router 7
-- **State Management**: React Context API
+- **PDF Generation**: jsPDF + autoTable
 
 ## 🛠️ Getting Started
 
 ### Prerequisites
 
 - Node.js (Latest LTS recommended)
-- npm or yarn
+- Supabase account (for database and authentication)
+
+### Environment Setup
+
+Create a `.env` file in the root directory and add your Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/SujalPatelDeveloper/Expense-Tracker.git
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -54,7 +66,7 @@ FinVista follows a **Premium Modern Aesthetics** approach:
 - **Typography**: Uses 'Outfit' for a modern, tech-forward feel.
 - **Colors**: A curated palette of Amber (`#f59e0b`) and Emerald (`#10b981`) against deep space backgrounds.
 - **Glassmorphism**: Extensive use of backdrop-filters, subtle borders, and layered transparency for a sophisticated UI.
-- **Animations**: Custom CSS keyframes and cubic-bezier transitions for a smooth, app-like experience.
+- **Precision**: Locale-aware numeric grouping and professional alignment across all tables and exports.
 
 ---
 

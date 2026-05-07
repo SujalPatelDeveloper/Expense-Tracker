@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTransactions } from '../context/TransactionContext';
 
 const CountUp = ({ end, duration = 1000, prefix = '', suffix = '', decimals = 0 }) => {
   const [count, setCount] = useState(0);
+  const { formatAmount } = useTransactions();
 
   useEffect(() => {
     let startTime;
@@ -28,10 +30,7 @@ const CountUp = ({ end, duration = 1000, prefix = '', suffix = '', decimals = 0 
   return (
     <span>
       {prefix}
-      {count.toLocaleString(undefined, {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
+      {formatAmount(count)}
       {suffix}
     </span>
   );
